@@ -10,7 +10,7 @@ def main() -> None:
     config = load_config()
     st.set_page_config(page_title="Certification Tracker", layout="wide")
     st.title("Certification Tracker")
-    st.caption("Environment bootstrap is complete. Dashboard modules come next.")
+    st.caption("Use the left sidebar to open Dashboard and Data Entry pages.")
 
     st.subheader("Environment")
     st.write(
@@ -27,6 +27,7 @@ def main() -> None:
         [{"file": name, "rows": rows} for name, rows in counts.items()],
         use_container_width=True,
     )
+    st.info("Next: open `01_dashboard` for analytics and `02_data_entry` to update tracker CSVs.")
 
 
 if __name__ == "__main__":

@@ -41,6 +41,9 @@ Out of scope for now:
 - CSV files are committed to git as the shared source of truth.
 - Small team usage (2 users, low write frequency) allows a simple write model.
 - Track/module ingestion is manual/on-demand.
+- Chart library decision: Plotly.
+- Week boundary decision for weekly aggregation: Monday (`date_trunc('week', ...)`).
+- CSV row ID strategy decision: UUID (`uuid4`).
 
 ## 3. Proposed Tech Stack
 
@@ -48,8 +51,7 @@ Out of scope for now:
 - Dashboard/UI: Streamlit
 - Query engine: DuckDB
 - Data interchange/storage: CSV files
-- Plotting:
-  - Plotly (interactive) or Altair (clean declarative charts)
+- Plotting: Plotly
 - Testing: pytest
 
 ## 3.1 Environment And Infrastructure Checklist (Do First)
@@ -319,30 +321,30 @@ Implementation note:
 ## 9.1 Next Planning Checklist
 
 - [ ] Complete pending validation:
-  - [ ] `uv run streamlit run app/main.py`
+  - [x] `uv run streamlit run app/main.py` (startup command executed; process is long-running)
   - [ ] Optional: `docker build -t certification-tracker .`
-- [ ] Lock key functional decisions:
-  - [ ] Choose chart library: Plotly or Altair
-  - [ ] Confirm week boundary: Monday or Sunday
-  - [ ] Confirm ID strategy for CSV rows (`uuid` recommended)
-- [ ] Finish Phase 1 foundations:
-  - [ ] Add `app/models/schemas.py`
-  - [ ] Add `app/models/enums.py`
-  - [ ] Add `app/services/metrics_service.py`
-  - [ ] Add `app/services/progress_service.py`
-  - [ ] Add seed fixture data for 2 users and 1 track (`AZ-104`)
-- [ ] Build Phase 2 dashboard MVP:
-  - [ ] Add global filters (date, user, track)
-  - [ ] Add time section (total/daily/weekly + weekly bar + breakdown tables)
-  - [ ] Add progress section (pie + horizontal bar)
-- [ ] Build Phase 3 data entry:
-  - [ ] Add time entry form (append to `time_entries.csv`)
-  - [ ] Add status update form (append to `module_progress.csv`)
-  - [ ] Add input validation rules
-- [ ] Add tests for new logic:
-  - [ ] Aggregations (daily/weekly/total)
-  - [ ] Latest-status resolution per `(user_id, module_id)`
-  - [ ] Progress percentage scoring
+- [x] Lock key functional decisions:
+  - [x] Choose chart library: Plotly
+  - [x] Confirm week boundary: Monday
+  - [x] Confirm ID strategy for CSV rows (UUID)
+- [x] Finish Phase 1 foundations:
+  - [x] Add `app/models/schemas.py`
+  - [x] Add `app/models/enums.py`
+  - [x] Add `app/services/metrics_service.py`
+  - [x] Add `app/services/progress_service.py`
+  - [x] Add seed fixture data for 2 users and 1 track (`AZ-104`)
+- [x] Build Phase 2 dashboard MVP:
+  - [x] Add global filters (date, user, track)
+  - [x] Add time section (total/daily/weekly + weekly bar + breakdown tables)
+  - [x] Add progress section (pie + horizontal bar)
+- [x] Build Phase 3 data entry:
+  - [x] Add time entry form (append to `time_entries.csv`)
+  - [x] Add status update form (append to `module_progress.csv`)
+  - [x] Add input validation rules
+- [x] Add tests for new logic:
+  - [x] Aggregations (daily/weekly/total)
+  - [x] Latest-status resolution per `(user_id, module_id)`
+  - [x] Progress percentage scoring
 
 ## 10. Testing Strategy (No CI for now)
 

@@ -31,3 +31,4 @@ target-version = "py312"
 python_version = "3.12"
 warn_unused_configs = true
 pretty = true
+ignore_missing_imports = true
