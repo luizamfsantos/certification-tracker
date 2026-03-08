@@ -316,6 +316,34 @@ Implementation note:
   - Import normalization and deduplication
 - Smoke test: app loads with fixture CSVs.
 
+## 9.1 Next Planning Checklist
+
+- [ ] Complete pending validation:
+  - [ ] `uv run streamlit run app/main.py`
+  - [ ] Optional: `docker build -t certification-tracker .`
+- [ ] Lock key functional decisions:
+  - [ ] Choose chart library: Plotly or Altair
+  - [ ] Confirm week boundary: Monday or Sunday
+  - [ ] Confirm ID strategy for CSV rows (`uuid` recommended)
+- [ ] Finish Phase 1 foundations:
+  - [ ] Add `app/models/schemas.py`
+  - [ ] Add `app/models/enums.py`
+  - [ ] Add `app/services/metrics_service.py`
+  - [ ] Add `app/services/progress_service.py`
+  - [ ] Add seed fixture data for 2 users and 1 track (`AZ-104`)
+- [ ] Build Phase 2 dashboard MVP:
+  - [ ] Add global filters (date, user, track)
+  - [ ] Add time section (total/daily/weekly + weekly bar + breakdown tables)
+  - [ ] Add progress section (pie + horizontal bar)
+- [ ] Build Phase 3 data entry:
+  - [ ] Add time entry form (append to `time_entries.csv`)
+  - [ ] Add status update form (append to `module_progress.csv`)
+  - [ ] Add input validation rules
+- [ ] Add tests for new logic:
+  - [ ] Aggregations (daily/weekly/total)
+  - [ ] Latest-status resolution per `(user_id, module_id)`
+  - [ ] Progress percentage scoring
+
 ## 10. Testing Strategy (No CI for now)
 
 Run tests locally before commits:
