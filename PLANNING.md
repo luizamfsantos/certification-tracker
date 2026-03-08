@@ -56,44 +56,45 @@ Out of scope for now:
 
 No cloud infrastructure is required for MVP. This is local-first infrastructure only.
 
-- [ ] Install required tooling:
+- [x] Install required tooling:
   - Git
   - Python 3.12+
   - `uv`
   - Docker Desktop (optional, for containerized local runs)
-- [ ] Configure repository trust (if needed on Windows):
+- [x] Configure repository trust (if needed on Windows):
   - `git config --global --add safe.directory C:/Users/lsant/Documents/repositories/certification-tracker`
-- [ ] Create local Python environment and install dependencies:
+- [x] Create local Python environment and install dependencies:
   - `uv venv`
   - `.venv\Scripts\Activate.ps1`
   - `uv sync`
-- [ ] Create initial project files:
+- [x] Create initial project files:
   - `pyproject.toml`
   - `uv.lock`
   - `.python-version` (optional but recommended)
-- [ ] Scaffold folders from Section 4 (`app/`, `data/`, `scripts/`, `tests/`).
-- [ ] Bootstrap CSV source files with headers only:
+- [x] Scaffold folders from Section 4 (`app/`, `data/`, `scripts/`, `tests/`).
+- [x] Bootstrap CSV source files with headers only:
   - `users.csv`
   - `certification_tracks.csv`
   - `learning_paths.csv`
   - `modules.csv`
   - `module_progress.csv`
   - `time_entries.csv`
-- [ ] Add baseline app shell:
+- [x] Add baseline app shell:
   - `app/main.py` (loads and renders basic page)
   - `app/services/duckdb_service.py` (connect + read CSVs)
-- [ ] Add local configuration baseline:
+- [x] Add local configuration baseline:
   - `.env.example` with non-secret defaults
   - app config loader with sane defaults for `data/curated`
-- [ ] Add quality/test tooling baseline:
+- [x] Add quality/test tooling baseline:
   - `pytest`
   - `ruff`
   - `mypy` (if enabled in this repo)
-- [ ] Add `Dockerfile` and `.dockerignore` for reproducible local runs.
+- [x] Add `Dockerfile` and `.dockerignore` for reproducible local runs.
 - [ ] Validate environment:
-  - `uv run pytest`
-  - `uv run streamlit run app/main.py`
-  - Optional: `docker build -t certification-tracker .`
+  - [x] `uv run pytest`
+  - [x] `uv run python -c "from app.main import main; print('app-import-ok')"`
+  - [ ] `uv run streamlit run app/main.py`
+  - [ ] Optional: `docker build -t certification-tracker .`
 
 ## 4. Repository Structure
 
