@@ -278,6 +278,7 @@ Global filters:
 
 Initial focus: Microsoft Learn tracks (example: `AZ-104`) using:
 - `https://learn.microsoft.com/api/catalog/`
+    (documentation: https://learn.microsoft.com/en-us/training/support/catalog-api-developer-reference)
 
 Workflow:
 1. User selects the target track/exam (for example `AZ-104`).
