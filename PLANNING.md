@@ -54,49 +54,10 @@ Out of scope for now:
 - Plotting: Plotly
 - Testing: pytest
 
-## 3.1 Environment And Infrastructure Checklist (Do First)
+## 3.1 Environment And Infrastructure
 
 No cloud infrastructure is required for MVP. This is local-first infrastructure only.
-
-- [x] Install required tooling:
-  - Git
-  - Python 3.12+
-  - `uv`
-  - Docker Desktop (optional, for containerized local runs)
-- [x] Configure repository trust (if needed on Windows):
-  - `git config --global --add safe.directory C:/Users/lsant/Documents/repositories/certification-tracker`
-- [x] Create local Python environment and install dependencies:
-  - `uv venv`
-  - `.venv\Scripts\Activate.ps1`
-  - `uv sync`
-- [x] Create initial project files:
-  - `pyproject.toml`
-  - `uv.lock`
-  - `.python-version` (optional but recommended)
-- [x] Scaffold folders from Section 4 (`app/`, `data/`, `scripts/`, `tests/`).
-- [x] Bootstrap CSV source files with headers only:
-  - `users.csv`
-  - `certification_tracks.csv`
-  - `learning_paths.csv`
-  - `modules.csv`
-  - `module_progress.csv`
-  - `time_entries.csv`
-- [x] Add baseline app shell:
-  - `app/main.py` (loads and renders basic page)
-  - `app/services/duckdb_service.py` (connect + read CSVs)
-- [x] Add local configuration baseline:
-  - `.env.example` with non-secret defaults
-  - app config loader with sane defaults for `data/curated`
-- [x] Add quality/test tooling baseline:
-  - `pytest`
-  - `ruff`
-  - `mypy` (if enabled in this repo)
-- [x] Add `Dockerfile` and `.dockerignore` for reproducible local runs.
-- [ ] Validate environment:
-  - [x] `uv run pytest`
-  - [x] `uv run python -c "from app.main import main; print('app-import-ok')"`
-  - [ ] `uv run streamlit run app/main.py`
-  - [ ] `docker build -t certification-tracker .`
+All execution checklists are consolidated in Section 10 (`Unified Execution Checklist`).
 
 ## 4. Repository Structure
 
@@ -322,15 +283,52 @@ Implementation note:
   - Import normalization and deduplication
 - Smoke test: app loads with fixture CSVs.
 
-## 9.1 Next Planning Checklist
+## 10. Unified Execution Checklist
 
-- [ ] Complete pending validation:
-  - [x] `uv run streamlit run app/main.py` (startup command executed; process is long-running)
-  - [ ] Optional: `docker build -t certification-tracker .`
-- [x] Lock key functional decisions:
-  - [x] Choose chart library: Plotly
-  - [x] Confirm week boundary: Monday
-  - [x] Confirm ID strategy for CSV rows (UUID)
+### 10.1 Environment And Infrastructure
+
+- [x] Install required tooling (Git, Python 3.12+, `uv`, optional Docker Desktop).
+- [x] Configure repository trust:
+  - `git config --global --add safe.directory C:/Users/lsant/Documents/repositories/certification-tracker`
+- [x] Create local environment and install dependencies:
+  - `uv venv`
+  - `.venv\Scripts\Activate.ps1`
+  - `uv sync`
+- [x] Create initial project files:
+  - `pyproject.toml`
+  - `uv.lock`
+  - `.python-version`
+- [x] Scaffold folders from Section 4 (`app/`, `data/`, `scripts/`, `tests/`).
+- [x] Bootstrap CSV source files with headers:
+  - `users.csv`
+  - `certification_tracks.csv`
+  - `learning_paths.csv`
+  - `modules.csv`
+  - `module_progress.csv`
+  - `time_entries.csv`
+- [x] Add baseline app shell and config:
+  - `app/main.py`
+  - `app/services/duckdb_service.py`
+  - `.env.example`
+- [x] Add quality tooling baseline:
+  - `pytest`
+  - `ruff`
+  - `mypy`
+- [x] Add `Dockerfile` and `.dockerignore`.
+- [x] Validate with `uv run pytest`.
+- [x] Validate importability with `uv run python -c "from app.main import main; print('app-import-ok')"`.
+- [x] Validate Streamlit startup (`uv run streamlit run app/main.py`; command is long-running).
+- [ ] Validate Docker image build (`docker build -t certification-tracker .`).
+
+### 10.2 Product And Architecture Decisions
+
+- [x] Chart library selected: Plotly.
+- [x] Weekly boundary selected: Monday (`date_trunc('week', ...)`).
+- [x] CSV row IDs selected: UUID (`uuid4`).
+- [x] Catalog ingestion source selected: Microsoft Learn Catalog API (`https://learn.microsoft.com/api/catalog/`).
+
+### 10.3 Delivered Implementation
+
 - [x] Finish Phase 1 foundations:
   - [x] Add `app/models/schemas.py`
   - [x] Add `app/models/enums.py`
@@ -349,8 +347,29 @@ Implementation note:
   - [x] Aggregations (daily/weekly/total)
   - [x] Latest-status resolution per `(user_id, module_id)`
   - [x] Progress percentage scoring
+- [x] Apply package-first import fix:
+  - [x] Configure build system/package discovery in `pyproject.toml`
+  - [x] Run `uv sync` to install project package
+  - [x] Remove temporary `sys.path` workarounds
 
-## 10. Testing Strategy (No CI for now)
+### 10.4 Next Steps (Current)
+
+- [ ] Implement Microsoft Learn Catalog API importer in `scripts/import_microsoft_learn.py`:
+  - [ ] Add pagination support
+  - [ ] Add retry/error handling
+- [ ] Map API entities into normalized records:
+  - [ ] `certification_tracks.csv`
+  - [ ] `learning_paths.csv`
+  - [ ] `modules.csv`
+- [ ] Implement idempotent upsert/dedup strategy for catalog imports.
+- [ ] Add import controls in `app/pages/03_catalog_import.py` (track/exam input + run import).
+- [ ] Add fixture-based tests for API mapping and deduplication behavior.
+- [ ] Run validation suite after importer work:
+  - [ ] `uv run pytest`
+  - [ ] `uv run ruff check .`
+  - [ ] `uv run mypy app scripts`
+
+## 11. Testing Strategy (No CI for now)
 
 Run tests locally before commits:
 
@@ -364,7 +383,7 @@ Minimum expected tests:
 - CSV read/write integrity for append operations
 - Import mapping behavior for representative Microsoft Learn Catalog API responses/snapshots
 
-## 11. Risks and Mitigations
+## 12. Risks and Mitigations
 
 - CSV merge conflicts:
   - Mitigation: append-only writes, small file granularity, frequent commits
@@ -373,7 +392,7 @@ Minimum expected tests:
 - Data consistency:
   - Mitigation: centralized validation in service layer + schema checks in tests
 
-## 12. Definition of Done (MVP)
+## 13. Definition of Done (MVP)
 
 MVP is done when:
 - Two users can log time and module status using UI controls only.
