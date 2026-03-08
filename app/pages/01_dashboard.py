@@ -1,14 +1,20 @@
 from __future__ import annotations
 
+import sys
 from datetime import date, timedelta
+from pathlib import Path
 
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from app.config import load_config
-from app.services.metrics_service import ALL_OPTION, get_date_bounds, get_filter_options, get_time_metrics
-from app.services.progress_service import get_progress_metrics
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from app.config import load_config  # noqa: E402
+from app.services.metrics_service import ALL_OPTION, get_date_bounds, get_filter_options, get_time_metrics  # noqa: E402
+from app.services.progress_service import get_progress_metrics  # noqa: E402
 
 
 def _minutes_to_hours(minutes: int) -> str:

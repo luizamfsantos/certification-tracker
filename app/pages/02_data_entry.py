@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+import sys
 from datetime import date
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
-from app.config import load_config
-from app.models.enums import ModuleStatus
-from app.models.schemas import ModuleProgressInput, TimeEntryInput
-from app.services.ingestion_service import append_module_progress, append_time_entry
-from app.services.metrics_service import get_filter_options, get_modules_for_track
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from app.config import load_config  # noqa: E402
+from app.models.enums import ModuleStatus  # noqa: E402
+from app.models.schemas import ModuleProgressInput, TimeEntryInput  # noqa: E402
+from app.services.ingestion_service import append_module_progress, append_time_entry  # noqa: E402
+from app.services.metrics_service import get_filter_options, get_modules_for_track  # noqa: E402
 
 
 def render() -> None:
