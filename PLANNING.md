@@ -7,7 +7,7 @@ Build a local Python dashboard to track certification study progress for a small
 In scope:
 - Multiple certification tracks (example: `AZ-104`)
 - Multiple users
-- Module catalog imported from cloud provider learning platforms (initially Microsoft Learn)
+- Module catalog imported from cloud provider catalog APIs (initially Microsoft Learn Catalog API: `https://learn.microsoft.com/api/catalog/`)
 - Time tracking (vertical bar chart):
   - Aggregate
   - Daily
@@ -30,7 +30,7 @@ In scope:
 Out of scope for now:
 - Authentication/authorization
 - Goals and deadlines
-- Automatic scraping/scheduled sync jobs
+- Automatic scheduled sync jobs
 - CI pipeline
 - Deployment
 
@@ -96,7 +96,7 @@ No cloud infrastructure is required for MVP. This is local-first infrastructure 
   - [x] `uv run pytest`
   - [x] `uv run python -c "from app.main import main; print('app-import-ok')"`
   - [ ] `uv run streamlit run app/main.py`
-  - [ ] Optional: `docker build -t certification-tracker .`
+  - [ ] `docker build -t certification-tracker .`
 
 ## 4. Repository Structure
 
@@ -274,21 +274,24 @@ Global filters:
   - Save button appends row to `module_progress.csv`
   - Dashboard resolves latest status per module/user
 
-## 8. Manual Catalog Import Workflow
+## 8. Manual Catalog Import Workflow (API-Based)
 
-Initial focus: Microsoft Learn tracks (example: `AZ-104`).
+Initial focus: Microsoft Learn tracks (example: `AZ-104`) using:
+- `https://learn.microsoft.com/api/catalog/`
 
 Workflow:
-1. User provides certification track URL(s) from `learn.microsoft.com`.
-2. Import script parses learning paths and modules.
-3. Script writes normalized rows into:
+1. User selects the target track/exam (for example `AZ-104`).
+2. Import script calls the Microsoft Learn Catalog API.
+3. Script filters and maps API entities into learning paths and modules.
+4. Script writes normalized rows into:
    - `certification_tracks.csv`
    - `learning_paths.csv`
    - `modules.csv`
-4. User reviews and commits CSV changes.
+5. User reviews and commits CSV changes.
 
 Implementation note:
-- Keep importer idempotent by upserting on stable IDs (provider + URL slug).
+- Keep importer idempotent by upserting on stable IDs (provider + catalog item ID/URL slug).
+- Keep provider-specific API mapping isolated so we can add other cloud providers later.
 
 ## 9. Modular Implementation Plan
 
@@ -308,7 +311,7 @@ Implementation note:
 - Add validations (required fields, positive minutes, valid status).
 
 ### Phase 4 - Catalog Import
-- Add Microsoft Learn importer script for selected track URLs.
+- Add Microsoft Learn Catalog API importer for selected tracks/exam codes.
 - Add deduplication/idempotency checks.
 
 ### Phase 5 - Test Coverage
@@ -358,14 +361,14 @@ Minimum expected tests:
 - Metrics aggregation correctness with fixed fixture data
 - Progress rollup correctness for mixed statuses
 - CSV read/write integrity for append operations
-- Import parser behavior for representative Microsoft Learn pages/snapshots
+- Import mapping behavior for representative Microsoft Learn Catalog API responses/snapshots
 
 ## 11. Risks and Mitigations
 
 - CSV merge conflicts:
   - Mitigation: append-only writes, small file granularity, frequent commits
-- External page structure changes on Learn:
-  - Mitigation: keep parser isolated and easy to adjust
+- External API schema/field changes on Learn catalog:
+  - Mitigation: keep API mapping isolated and covered by fixture-based tests
 - Data consistency:
   - Mitigation: centralized validation in service layer + schema checks in tests
 
