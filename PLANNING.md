@@ -354,20 +354,20 @@ Implementation note:
 
 ### 10.4 Next Steps (Current)
 
-- [ ] Implement Microsoft Learn Catalog API importer in `scripts/import_microsoft_learn.py`:
-  - [ ] Add pagination support
-  - [ ] Add retry/error handling
-- [ ] Map API entities into normalized records:
-  - [ ] `certification_tracks.csv`
-  - [ ] `learning_paths.csv`
-  - [ ] `modules.csv`
-- [ ] Implement idempotent upsert/dedup strategy for catalog imports.
-- [ ] Add import controls in `app/pages/03_catalog_import.py` (track/exam input + run import).
-- [ ] Add fixture-based tests for API mapping and deduplication behavior.
-- [ ] Run validation suite after importer work:
-  - [ ] `uv run pytest`
-  - [ ] `uv run ruff check .`
-  - [ ] `uv run mypy app scripts`
+- [x] Implement Microsoft Learn Catalog API importer in `scripts/import_microsoft_learn.py`:
+  - [x] Add pagination support
+  - [x] Add retry/error handling
+- [x] Map API entities into normalized records:
+  - [x] `certification_tracks.csv`
+  - [x] `learning_paths.csv`
+  - [x] `modules.csv`
+- [x] Implement idempotent upsert/dedup strategy for catalog imports.
+- [x] Add import controls in `app/pages/03_catalog_import.py` (track/exam input + run import).
+- [x] Add fixture-based tests for API mapping and deduplication behavior.
+- [x] Run validation suite after importer work:
+  - [x] `uv run pytest`
+  - [x] `uv run ruff check .`
+  - [x] `uv run mypy app scripts`
 
 ## 11. Testing Strategy (No CI for now)
 

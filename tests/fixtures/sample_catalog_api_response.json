@@ -1,0 +1,38 @@
+{
+  "items": [
+    {
+      "uid": "certification.azure-administrator-associate",
+      "type": "certification",
+      "title": "Azure Administrator Associate (AZ-104)",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-administrator/"
+    },
+    {
+      "uid": "learn.wwl.az-104-configure-virtual-networks",
+      "type": "learningPath",
+      "title": "Configure virtual networks for AZ-104",
+      "url": "https://learn.microsoft.com/en-us/training/paths/az-104-configure-manage-virtual-networks/",
+      "modules": [
+        "learn.wwl.az-104-introduction-to-virtual-networks",
+        "learn.wwl.az-104-vnet-peering"
+      ]
+    },
+    {
+      "uid": "learn.wwl.az-104-introduction-to-virtual-networks",
+      "type": "module",
+      "title": "Introduction to Azure virtual networks",
+      "url": "https://learn.microsoft.com/en-us/training/modules/introduction-to-azure-virtual-networks/"
+    },
+    {
+      "uid": "learn.wwl.az-104-vnet-peering",
+      "type": "module",
+      "title": "Design and implement VNet peering",
+      "url": "https://learn.microsoft.com/en-us/training/modules/design-implement-vnet-peering/"
+    },
+    {
+      "uid": "learn.wwl.az-900-fundamentals",
+      "type": "module",
+      "title": "Azure fundamentals overview",
+      "url": "https://learn.microsoft.com/en-us/training/modules/azure-fundamentals-overview/"
+    }
+  ]
+}
