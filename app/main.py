@@ -1,16 +1,9 @@
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 import streamlit as st
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from app.config import load_config  # noqa: E402
-from app.services.duckdb_service import count_rows_for_curated_csvs  # noqa: E402
+from app.config import load_config
+from app.services.duckdb_service import count_rows_for_curated_csvs
 
 
 def main() -> None:
