@@ -52,6 +52,49 @@ Out of scope for now:
   - Plotly (interactive) or Altair (clean declarative charts)
 - Testing: pytest
 
+## 3.1 Environment And Infrastructure Checklist (Do First)
+
+No cloud infrastructure is required for MVP. This is local-first infrastructure only.
+
+- [ ] Install required tooling:
+  - Git
+  - Python 3.12+
+  - `uv`
+  - Docker Desktop (optional, for containerized local runs)
+- [ ] Configure repository trust (if needed on Windows):
+  - `git config --global --add safe.directory C:/Users/lsant/Documents/repositories/certification-tracker`
+- [ ] Create local Python environment and install dependencies:
+  - `uv venv`
+  - `.venv\Scripts\Activate.ps1`
+  - `uv sync`
+- [ ] Create initial project files:
+  - `pyproject.toml`
+  - `uv.lock`
+  - `.python-version` (optional but recommended)
+- [ ] Scaffold folders from Section 4 (`app/`, `data/`, `scripts/`, `tests/`).
+- [ ] Bootstrap CSV source files with headers only:
+  - `users.csv`
+  - `certification_tracks.csv`
+  - `learning_paths.csv`
+  - `modules.csv`
+  - `module_progress.csv`
+  - `time_entries.csv`
+- [ ] Add baseline app shell:
+  - `app/main.py` (loads and renders basic page)
+  - `app/services/duckdb_service.py` (connect + read CSVs)
+- [ ] Add local configuration baseline:
+  - `.env.example` with non-secret defaults
+  - app config loader with sane defaults for `data/curated`
+- [ ] Add quality/test tooling baseline:
+  - `pytest`
+  - `ruff`
+  - `mypy` (if enabled in this repo)
+- [ ] Add `Dockerfile` and `.dockerignore` for reproducible local runs.
+- [ ] Validate environment:
+  - `uv run pytest`
+  - `uv run streamlit run app/main.py`
+  - Optional: `docker build -t certification-tracker .`
+
 ## 4. Repository Structure
 
 ```text
