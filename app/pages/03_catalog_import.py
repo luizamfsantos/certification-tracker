@@ -72,54 +72,54 @@ def render() -> None:
         track_id_by_label = {label: track_id for track_id, label in track_options}
         track_labels = [label for _, label in track_options]
 
-        with st.form("catalog_delete_path_form"):
-            selected_track_label = st.selectbox(
-                "Track",
-                options=track_labels,
-                index=None,
-                placeholder="Select a track",
-            )
-            selected_track_id = (
-                track_id_by_label[selected_track_label] if selected_track_label else None
-            )
-            filtered_paths = [
-                row
-                for row in learning_paths
-                if selected_track_id and row.get("track_id", "") == selected_track_id
-            ]
-            path_options = [row["path_id"] for row in filtered_paths]
-            path_labels = {
-                row["path_id"]: row.get("path_name", row["path_id"]) for row in filtered_paths
-            }
+        selected_track_label = st.selectbox(
+            "Track",
+            options=track_labels,
+            index=None,
+            placeholder="Select a track",
+            key="delete_track_select",
+        )
+        selected_track_id = (
+            track_id_by_label[selected_track_label] if selected_track_label else None
+        )
+        filtered_paths = [
+            row
+            for row in learning_paths
+            if selected_track_id and row.get("track_id", "") == selected_track_id
+        ]
+        path_options = [row["path_id"] for row in filtered_paths]
+        path_labels = {
+            row["path_id"]: row.get("path_name", row["path_id"]) for row in filtered_paths
+        }
 
-            selected_path_id = st.selectbox(
-                "Learning path",
-                options=path_options,
-                index=None,
-                placeholder="Select a learning path"
-                if selected_track_id
-                else "Select a track first",
-                disabled=selected_track_id is None,
-                format_func=lambda path_id: path_labels.get(path_id, path_id),
-            )
-            delete_submit = st.form_submit_button(
-                "Delete learning path and modules",
-                disabled=selected_path_id is None,
-            )
-            if delete_submit:
-                try:
-                    delete_summary = delete_learning_path_and_modules(
-                        data_dir=config.data_dir,
-                        path_id=selected_path_id or "",
-                    )
-                    st.success(
-                        "Deletion completed. "
-                        f"Removed {delete_summary.deleted_paths} learning path and "
-                        f"{delete_summary.deleted_modules} modules."
-                    )
-                    st.json(delete_summary.to_dict(), expanded=False)
-                except Exception as exc:
-                    st.error(f"Delete failed: {exc}")
+        selected_path_id = st.selectbox(
+            "Learning path",
+            options=path_options,
+            index=None,
+            placeholder="Select a learning path" if selected_track_id else "Select a track first",
+            disabled=selected_track_id is None,
+            format_func=lambda path_id: path_labels.get(path_id, path_id),
+            key="delete_path_select",
+        )
+        delete_submit = st.button(
+            "Delete learning path and modules",
+            disabled=selected_path_id is None,
+            key="delete_path_button",
+        )
+        if delete_submit:
+            try:
+                delete_summary = delete_learning_path_and_modules(
+                    data_dir=config.data_dir,
+                    path_id=selected_path_id or "",
+                )
+                st.success(
+                    "Deletion completed. "
+                    f"Removed {delete_summary.deleted_paths} learning path and "
+                    f"{delete_summary.deleted_modules} modules."
+                )
+                st.json(delete_summary.to_dict(), expanded=False)
+            except Exception as exc:
+                st.error(f"Delete failed: {exc}")
 
 
 if __name__ == "__main__":
