@@ -34,8 +34,9 @@ def render() -> None:
     users_df, tracks_df = get_filter_options(config.data_dir)
     min_date, max_date = get_date_bounds(config.data_dir)
 
-    with st.sidebar:
-        st.header("Filters")
+    st.subheader("Filters")
+    filter_col1, filter_col2, filter_col3 = st.columns(3)
+    with filter_col1:
         date_range = st.date_input(
             "Date range",
             (min_date - timedelta(days=14), max_date),
@@ -54,11 +55,13 @@ def render() -> None:
             start_date = single_date if isinstance(single_date, date) else max_date
             end_date = start_date
 
+    with filter_col2:
         user_options = [ALL_OPTION] + users_df["user_id"].tolist()
         user_filter = st.selectbox(
             "User", user_options, format_func=lambda v: _user_label(v, users_df)
         )
 
+    with filter_col3:
         track_options = [ALL_OPTION] + tracks_df["track_id"].tolist()
         track_filter = st.selectbox(
             "Track", track_options, format_func=lambda v: _track_label(v, tracks_df)
