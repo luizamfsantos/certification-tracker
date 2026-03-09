@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
+from io import StringIO
 from pathlib import Path
 
 import duckdb
@@ -55,19 +56,7 @@ def _create_connection(data_dir: Path) -> duckdb.DuckDBPyConnection:
     for table_name, config in TABLE_CONFIG.items():
         csv_path = data_dir / config.filename
         _ensure_csv_header(csv_path, config.headers)
-        escaped_path = str(csv_path).replace("\\", "/").replace("'", "''")
-        conn.execute(
-            f"CREATE VIEW {table_name} AS "
-            "SELECT * FROM read_csv("
-            f"'{escaped_path}', "
-            "header=TRUE, "
-            "delim=',', "
-            "quote='\"', "
-            "escape='\"', "
-            "ignore_errors=TRUE, "
-            "null_padding=TRUE"
-            ");"
-        )
+        _create_csv_view(conn, table_name, csv_path)
     return conn
 
 
@@ -124,6 +113,72 @@ def _write_header_only(csv_path: Path, headers: list[str]) -> None:
     with csv_path.open("w", newline="", encoding="utf-8") as file_obj:
         writer = csv.writer(file_obj)
         writer.writerow(headers)
+
+
+def _create_csv_view(
+    conn: duckdb.DuckDBPyConnection,
+    table_name: str,
+    csv_path: Path,
+) -> None:
+    escaped_path = str(csv_path).replace("\\", "/").replace("'", "''")
+    statement = (
+        f"CREATE VIEW {table_name} AS "
+        "SELECT * FROM read_csv("
+        f"'{escaped_path}', "
+        "header=TRUE, "
+        "delim=',', "
+        "quote='\"', "
+        "escape='\"', "
+        "ignore_errors=TRUE, "
+        "null_padding=TRUE"
+        ");"
+    )
+    try:
+        conn.execute(statement)
+    except duckdb.InvalidInputException:
+        _normalize_csv_rows(csv_path, TABLE_CONFIG[table_name].headers)
+        conn.execute(statement)
+
+
+def _normalize_csv_rows(csv_path: Path, expected_headers: list[str]) -> None:
+    if not csv_path.exists() or csv_path.stat().st_size == 0:
+        _write_header_only(csv_path, expected_headers)
+        return
+
+    text = csv_path.read_text(encoding="utf-8-sig", errors="replace").replace("\x00", "")
+    lines = [line for line in text.splitlines() if line.strip()]
+    if not lines:
+        _write_header_only(csv_path, expected_headers)
+        return
+
+    valid_rows: list[list[str]] = []
+    expected_count = len(expected_headers)
+
+    def parse_line(line: str) -> list[str] | None:
+        try:
+            parsed_rows = list(csv.reader(StringIO(line)))
+        except csv.Error:
+            return None
+        if not parsed_rows:
+            return None
+        row = [cell.strip() for cell in parsed_rows[0]]
+        return row
+
+    header = parse_line(lines[0])
+    start_index = 1 if header == expected_headers else 0
+
+    for line in lines[start_index:]:
+        row = parse_line(line)
+        if not row:
+            continue
+        if len(row) != expected_count:
+            continue
+        valid_rows.append(row)
+
+    with csv_path.open("w", newline="", encoding="utf-8") as file_obj:
+        writer = csv.writer(file_obj)
+        writer.writerow(expected_headers)
+        writer.writerows(valid_rows)
 
 
 def _to_int(value: object, fallback: int) -> int:
