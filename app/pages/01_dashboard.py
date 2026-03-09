@@ -7,6 +7,7 @@ import plotly.express as px
 import streamlit as st
 
 from app.config import load_config
+from app.models.enums import ModuleStatus
 from app.services.metrics_service import (
     ALL_OPTION,
     get_date_bounds,
@@ -14,6 +15,13 @@ from app.services.metrics_service import (
     get_time_metrics,
 )
 from app.services.progress_service import get_progress_metrics
+
+
+STATUS_COLORS = {
+    ModuleStatus.NOT_SEEN.value: "#9CA3AF",
+    ModuleStatus.SEEN.value: "#FACC15",
+    ModuleStatus.MASTERED.value: "#22C55E",
+}
 
 
 def _minutes_to_hours(minutes: int) -> str:
@@ -104,6 +112,8 @@ def render() -> None:
         values="count",
         names="status",
         title="Status Distribution",
+        color="status",
+        color_discrete_map=STATUS_COLORS,
     )
     pie_col.plotly_chart(pie_fig, width="stretch")
 
