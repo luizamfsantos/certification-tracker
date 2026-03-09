@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import textwrap
 from datetime import date, timedelta
 
 import pandas as pd
@@ -32,6 +33,14 @@ def _weekly_chart_df(weekly_df: pd.DataFrame) -> pd.DataFrame:
     chart_df = weekly_df.copy()
     chart_df["week_label"] = pd.to_datetime(chart_df["week_start"]).dt.strftime("%Y-%m-%d")
     return chart_df
+
+
+def _progress_bar_chart_df(progress_bar_df: pd.DataFrame) -> pd.DataFrame:
+    chart_df = progress_bar_df.copy()
+    chart_df["label_wrapped"] = chart_df["label"].apply(
+        lambda value: "<br>".join(textwrap.wrap(str(value), width=28))
+    )
+    return chart_df.sort_values("completion_pct", ascending=True)
 
 
 def render() -> None:
@@ -118,13 +127,20 @@ def render() -> None:
     pie_col.plotly_chart(pie_fig, width="stretch")
 
     if not progress_metrics.progress_bar_df.empty:
+        progress_chart_df = _progress_bar_chart_df(progress_metrics.progress_bar_df)
         bar_fig = px.bar(
-            progress_metrics.progress_bar_df,
+            progress_chart_df,
             x="completion_pct",
-            y="label",
+            y="label_wrapped",
             orientation="h",
             title="Completion by Dimension",
-            labels={"completion_pct": "Completion %", "label": "Dimension"},
+            labels={"completion_pct": "Completion %", "label_wrapped": "Dimension"},
+            height=120 + len(progress_chart_df) * 70,
+        )
+        bar_fig.update_layout(
+            margin=dict(l=260, r=40, t=60, b=40),
+            yaxis_title="Dimension",
+            xaxis_title="Completion %",
         )
         bar_col.plotly_chart(bar_fig, width="stretch")
     else:
