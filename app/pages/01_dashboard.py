@@ -142,6 +142,7 @@ def render() -> None:
             yaxis_title="Dimension",
             xaxis_title="Completion %",
         )
+        bar_fig.update_xaxes(range=[0, 100], ticksuffix="%")
         bar_col.plotly_chart(bar_fig, width="stretch")
     else:
         bar_col.info("No progress data for selected filters.")
