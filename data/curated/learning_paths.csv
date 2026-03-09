@@ -1,7 +1,4 @@
 path_id,track_id,path_name,provider_url
-lp-az104-network,az-104,Configure virtual networks,https://learn.microsoft.com/training/paths/az-104-configure-manage-virtual-networks/
-lp-az104-governance,az-104,Manage identities and governance,https://learn.microsoft.com/training/paths/az-104-manage-identities-governance/
-lp-az-104-general,az-104,AZ-104 Certification Track - General,
 learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,Prepare to teach AZ-104 Microsoft Azure Administrator in the classroom,https://learn.microsoft.com/en-us/training/paths/prepare-teach-az-104-microsoft-azure-administrator/?WT.mc_id=api_CatalogApi
 learn-az104-admin-prerequisites,az-104,AZ-104: Prerequisites for Azure administrators,https://learn.microsoft.com/en-us/training/paths/az-104-administrator-prerequisites/?WT.mc_id=api_CatalogApi
 learn-az-104-manage-identities-governance,az-104,AZ-104: Manage identities and governance in Azure,https://learn.microsoft.com/en-us/training/paths/az-104-manage-identities-governance/?WT.mc_id=api_CatalogApi

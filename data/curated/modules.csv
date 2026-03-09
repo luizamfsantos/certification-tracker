@@ -1,14 +1,10 @@
 module_id,path_id,track_id,module_name,provider_url,module_order
-mod-vnet-intro,lp-az104-network,az-104,Introduction to Azure virtual networks,https://learn.microsoft.com/training/modules/introduction-to-azure-virtual-networks/,1
-mod-vnet-peering,lp-az104-network,az-104,Design and implement VNet peering,https://learn.microsoft.com/training/modules/design-implement-vnet-peering/,2
-mod-iam-rbac,lp-az104-governance,az-104,Manage Azure identities and RBAC,https://learn.microsoft.com/training/modules/manage-azure-identities-rbac/,1
-mod-governance,lp-az104-governance,az-104,Implement governance and compliance in Azure,https://learn.microsoft.com/training/modules/implement-governance-compliance-azure/,2
-learn-wwl-get-tips-tricks-teach-az-104-microsoft-azure-administrator,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,get tips tricks teach az 104 microsoft azure administrator,,6
-learn-wwl-learn-best-practices-from-microsoft-technical-trainers-for-az-104,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,learn best practices from microsoft technical trainers for az 104,,5
 learn-wwl-introduction-microsoft-learn-educators-program,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,introduction microsoft learn educators program,,1
 learn-wwl-onboard-microsoft-learn-educators-program,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,onboard microsoft learn educators program,,2
 learn-wwl-microsoft-learn-educators-course-preparation,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,microsoft learn educators course preparation,,3
 learn-wwl-microsoft-learn-educators-course-plan,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,microsoft learn educators course plan,,4
+learn-wwl-learn-best-practices-from-microsoft-technical-trainers-for-az-104,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,learn best practices from microsoft technical trainers for az 104,,5
+learn-wwl-get-tips-tricks-teach-az-104-microsoft-azure-administrator,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,get tips tricks teach az 104 microsoft azure administrator,,6
 learn-wwl-prepare-for-course-delivery,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,prepare for course delivery,,7
 learn-wwl-close-out-course,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,close out course,,8
 learn-intro-to-azure-cloud-shell,learn-az104-admin-prerequisites,az-104,intro to azure cloud shell,,1

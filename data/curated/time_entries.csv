@@ -1,8 +1,1 @@
 entry_id,user_id,track_id,module_id,minutes_spent,entry_date,created_at
-t1,u1,az-104,mod-vnet-intro,60,2026-03-02,2026-03-02T18:00:00Z
-t2,u1,az-104,mod-vnet-peering,45,2026-03-03,2026-03-03T18:00:00Z
-t3,u2,az-104,mod-iam-rbac,30,2026-03-03,2026-03-03T20:00:00Z
-t4,u2,az-104,mod-governance,90,2026-03-07,2026-03-07T19:00:00Z
-t5,u1,az-104,mod-governance,40,2026-02-25,2026-02-25T19:00:00Z
-t6,u2,az-104,mod-vnet-intro,50,2026-02-26,2026-02-26T19:00:00Z
-t7,u1,az-104,mod-iam-rbac,20,2026-03-08,2026-03-08T21:00:00Z

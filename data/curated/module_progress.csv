@@ -1,9 +1,1 @@
 entry_id,user_id,module_id,status,updated_at
-p1,u1,mod-vnet-intro,seen,2026-03-01T10:00:00Z
-p2,u1,mod-vnet-intro,mastered,2026-03-03T18:00:00Z
-p3,u1,mod-vnet-peering,seen,2026-03-04T09:00:00Z
-p4,u1,mod-iam-rbac,not_seen,2026-03-05T09:00:00Z
-p5,u2,mod-vnet-intro,seen,2026-03-02T11:00:00Z
-p6,u2,mod-vnet-peering,not_seen,2026-03-02T11:10:00Z
-p7,u2,mod-iam-rbac,seen,2026-03-06T15:00:00Z
-p8,u2,mod-governance,mastered,2026-03-07T15:00:00Z
