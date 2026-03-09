@@ -4,7 +4,9 @@ import csv
 import json
 from pathlib import Path
 
-from app.services.catalog_import_service import import_catalog_to_csv, map_catalog_to_rows
+import pytest
+
+from app.services.catalog_import_service import import_catalog_to_csv, map_catalog_to_rows, _parse_json_response
 from scripts.bootstrap_data import bootstrap_curated_csvs
 
 
@@ -44,3 +46,16 @@ def test_import_catalog_to_csv_is_idempotent(tmp_path: Path) -> None:
     with (data_dir / "modules.csv").open("r", encoding="utf-8", newline="") as file_obj:
         rows = list(csv.DictReader(file_obj))
     assert len(rows) == 2
+
+
+def test_parse_json_response_supports_utf8_bom() -> None:
+    body = b"\xef\xbb\xbf{\"items\":[]}"
+    payload = _parse_json_response(body, "application/json; charset=utf-8", "https://learn.microsoft.com/api/catalog/")
+    assert isinstance(payload, dict)
+    assert payload["items"] == []
+
+
+def test_parse_json_response_rejects_html() -> None:
+    html = b"<!DOCTYPE html><html><body>not json</body></html>"
+    with pytest.raises(ValueError, match="Expected JSON"):
+        _parse_json_response(html, "text/html; charset=utf-8", "https://learn.microsoft.com/api/catalog/")

@@ -6,6 +6,7 @@ import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
+from urllib.error import ContentTooShortError
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin
 from urllib.request import Request, urlopen
@@ -219,17 +220,79 @@ def upsert_csv_rows(csv_path: Path, key_field: str, rows: list[dict[str, str]]) 
 
 
 def _request_json(url: str, retries: int, timeout_seconds: int) -> dict[str, Any] | list[Any]:
-    attempt = 0
-    while True:
+    max_attempts = max(1, retries)
+    for attempt in range(1, max_attempts + 1):
         try:
-            request = Request(url, headers={"User-Agent": "certification-tracker/0.1"})
+            request = Request(
+                url,
+                headers={
+                    "User-Agent": "certification-tracker/0.1",
+                    "Accept": "application/json",
+                },
+            )
             with urlopen(request, timeout=timeout_seconds) as response:
-                return json.loads(response.read().decode("utf-8"))
-        except (URLError, HTTPError, TimeoutError, json.JSONDecodeError):
-            attempt += 1
-            if attempt >= retries:
-                raise
-            time.sleep(min(2**attempt, 5))
+                body = response.read()
+                content_type = str(response.headers.get("Content-Type", ""))
+                return _parse_json_response(body, content_type, url)
+        except HTTPError as exc:
+            should_retry = exc.code == 429 or exc.code >= 500
+            message = _build_http_error_message(url, exc)
+            if not should_retry or attempt >= max_attempts:
+                raise RuntimeError(message) from exc
+            time.sleep(_retry_delay_seconds(attempt, exc.headers.get("Retry-After")))
+        except (URLError, TimeoutError, ContentTooShortError) as exc:
+            if attempt >= max_attempts:
+                raise RuntimeError(f"Catalog API request failed for {url}: {exc}") from exc
+            time.sleep(_retry_delay_seconds(attempt, None))
+        except ValueError as exc:
+            # Parsing/content-type errors are deterministic for a given endpoint, so fail fast.
+            raise RuntimeError(str(exc)) from exc
+
+    raise RuntimeError(f"Catalog API request failed after {max_attempts} attempts for {url}")
+
+
+def _parse_json_response(body: bytes, content_type: str, url: str) -> dict[str, Any] | list[Any]:
+    text = body.decode("utf-8-sig", errors="replace")
+    normalized_content_type = content_type.lower()
+    stripped = text.lstrip()
+
+    if "json" not in normalized_content_type and stripped.startswith("<"):
+        raise ValueError(
+            f"Expected JSON from {url} but got non-JSON response "
+            f"(Content-Type: {content_type or 'unknown'})."
+        )
+
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError as exc:
+        preview = stripped[:180].replace("\n", " ")
+        raise ValueError(
+            f"Failed to parse JSON from {url}: {exc.msg}. Response preview: {preview}"
+        ) from exc
+
+    if not isinstance(payload, (dict, list)):
+        raise ValueError(f"Unexpected JSON payload type from {url}: {type(payload).__name__}")
+    return payload
+
+
+def _build_http_error_message(url: str, exc: HTTPError) -> str:
+    preview = ""
+    try:
+        raw = exc.read()
+        preview = raw.decode("utf-8", errors="replace").strip().replace("\n", " ")[:180]
+    except Exception:
+        preview = ""
+    suffix = f" Response preview: {preview}" if preview else ""
+    return f"Catalog API request failed for {url} with HTTP {exc.code}.{suffix}"
+
+
+def _retry_delay_seconds(attempt: int, retry_after_header: str | None) -> float:
+    if retry_after_header:
+        try:
+            return max(0.0, float(retry_after_header))
+        except ValueError:
+            pass
+    return float(min(2**attempt, 8))
 
 
 def _extract_items_and_next(
