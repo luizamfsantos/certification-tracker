@@ -43,6 +43,21 @@ def _progress_bar_chart_df(progress_bar_df: pd.DataFrame) -> pd.DataFrame:
     return chart_df.sort_values("completion_pct", ascending=True)
 
 
+def _current_streak_days(daily_df: pd.DataFrame, end_date: date) -> int:
+    if daily_df.empty:
+        return 0
+
+    worked_dates = set(
+        pd.to_datetime(daily_df.loc[daily_df["minutes"] > 0, "entry_date"]).dt.date.tolist()
+    )
+    streak = 0
+    cursor = end_date
+    while cursor in worked_dates:
+        streak += 1
+        cursor -= timedelta(days=1)
+    return streak
+
+
 def _daily_heatmap_pivot(
     daily_df: pd.DataFrame,
     start_date: date,
@@ -121,10 +136,12 @@ def render() -> None:
     progress_metrics = get_progress_metrics(config.data_dir, user_filter, track_filter)
 
     st.subheader("Time Tracking")
-    metric_col1, metric_col2, metric_col3 = st.columns(3)
+    streak_days = _current_streak_days(time_metrics.daily_df, end_date)
+    metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
     metric_col1.metric("Total", _minutes_to_hours(time_metrics.total_minutes))
-    metric_col2.metric("Daily", _minutes_to_hours(time_metrics.daily_minutes))
-    metric_col3.metric("Weekly", _minutes_to_hours(time_metrics.weekly_minutes))
+    metric_col2.metric("Weekly", _minutes_to_hours(time_metrics.weekly_minutes))
+    metric_col3.metric("Daily", _minutes_to_hours(time_metrics.daily_minutes))
+    metric_col4.metric("Streak", f"{streak_days} day(s)")
 
     if not time_metrics.weekly_df.empty:
         weekly_chart_df = _weekly_chart_df(time_metrics.weekly_df)
@@ -140,33 +157,10 @@ def render() -> None:
     else:
         st.info("No time entries found for selected filters.")
 
-    daily_heatmap_matrix = _daily_heatmap_pivot(time_metrics.daily_df, start_date, end_date)
-    heatmap_fig = px.imshow(
-        daily_heatmap_matrix,
-        aspect="auto",
-        title="Daily Study Heatmap",
-        labels={"x": "Week Start", "y": "Day", "color": "Minutes"},
-        color_continuous_scale=[
-            (0.0, "#ebedf0"),
-            (0.25, "#9be9a8"),
-            (0.5, "#40c463"),
-            (0.75, "#30a14e"),
-            (1.0, "#216e39"),
-        ],
-    )
-    heatmap_fig.update_layout(margin=dict(l=40, r=20, t=60, b=40))
-    st.plotly_chart(heatmap_fig, width="stretch")
-
-    st.write("Breakdowns")
-    breakdown_col1, breakdown_col2, breakdown_col3 = st.columns(3)
-    breakdown_col1.dataframe(time_metrics.per_user_df, width="stretch")
-    breakdown_col2.dataframe(time_metrics.per_module_df, width="stretch")
-    breakdown_col3.dataframe(time_metrics.per_track_df, width="stretch")
-
     st.subheader("Progress Toward Certification")
-    st.metric("Completion", f"{progress_metrics.completion_pct:.2f}%")
-
-    pie_col, bar_col = st.columns(2)
+    completion_col, pie_col = st.columns(2)
+    completion_col.metric("Completion Progress", f"{progress_metrics.completion_pct:.2f}%")
+    completion_col.progress(min(max(progress_metrics.completion_pct / 100.0, 0.0), 1.0))
     pie_fig = px.pie(
         progress_metrics.status_distribution_df,
         values="count",
@@ -177,6 +171,7 @@ def render() -> None:
     )
     pie_col.plotly_chart(pie_fig, width="stretch")
 
+    st.subheader("Dimension Completion")
     if not progress_metrics.progress_bar_df.empty:
         progress_chart_df = _progress_bar_chart_df(progress_metrics.progress_bar_df)
         bar_fig = px.bar(
@@ -194,9 +189,29 @@ def render() -> None:
             xaxis_title="Completion %",
         )
         bar_fig.update_xaxes(range=[0, 100], ticksuffix="%")
-        bar_col.plotly_chart(bar_fig, width="stretch")
+        st.plotly_chart(bar_fig, width="stretch")
     else:
-        bar_col.info("No progress data for selected filters.")
+        st.info("No progress data for selected filters.")
+
+    st.subheader("Module Table")
+    st.dataframe(time_metrics.per_module_df, width="stretch")
+
+    st.subheader("Daily Heatmap")
+    daily_heatmap_matrix = _daily_heatmap_pivot(time_metrics.daily_df, start_date, end_date)
+    heatmap_fig = px.imshow(
+        daily_heatmap_matrix,
+        aspect="auto",
+        labels={"x": "Week Start", "y": "Day", "color": "Minutes"},
+        color_continuous_scale=[
+            (0.0, "#ebedf0"),
+            (0.25, "#9be9a8"),
+            (0.5, "#40c463"),
+            (0.75, "#30a14e"),
+            (1.0, "#216e39"),
+        ],
+    )
+    heatmap_fig.update_layout(title="Daily Study Heatmap", margin=dict(l=40, r=20, t=60, b=40))
+    st.plotly_chart(heatmap_fig, width="stretch")
 
 
 def _user_label(user_id: str, users_df: pd.DataFrame) -> str:
