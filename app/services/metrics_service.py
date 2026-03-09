@@ -97,7 +97,7 @@ def get_time_metrics(
     weekly_df = query_df(
         data_dir,
         (
-            "SELECT date_trunc('week', CAST(t.entry_date AS DATE)) AS week_start, "
+            "SELECT CAST(date_trunc('week', CAST(t.entry_date AS DATE)) AS DATE) AS week_start, "
             "SUM(t.minutes_spent) AS minutes "
             f"FROM time_entries t WHERE {where_clause} "
             "GROUP BY 1 ORDER BY 1;"
