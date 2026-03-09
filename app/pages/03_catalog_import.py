@@ -61,26 +61,56 @@ def render() -> None:
     if not learning_paths:
         st.info("No learning paths available.")
     else:
-        path_options = [row["path_id"] for row in learning_paths]
-        path_labels = {
-            row[
-                "path_id"
-            ]: f"{row.get('track_id', '').upper()} | {row.get('path_name', row['path_id'])}"
-            for row in learning_paths
-        }
+        track_options = sorted(
+            {
+                (row.get("track_id", ""), row.get("track_id", "").upper())
+                for row in learning_paths
+                if row.get("track_id", "")
+            },
+            key=lambda entry: entry[1],
+        )
+        track_id_by_label = {label: track_id for track_id, label in track_options}
+        track_labels = [label for _, label in track_options]
 
         with st.form("catalog_delete_path_form"):
+            selected_track_label = st.selectbox(
+                "Track",
+                options=track_labels,
+                index=None,
+                placeholder="Select a track",
+            )
+            selected_track_id = (
+                track_id_by_label[selected_track_label] if selected_track_label else None
+            )
+            filtered_paths = [
+                row
+                for row in learning_paths
+                if selected_track_id and row.get("track_id", "") == selected_track_id
+            ]
+            path_options = [row["path_id"] for row in filtered_paths]
+            path_labels = {
+                row["path_id"]: row.get("path_name", row["path_id"]) for row in filtered_paths
+            }
+
             selected_path_id = st.selectbox(
                 "Learning path",
-                path_options,
+                options=path_options,
+                index=None,
+                placeholder="Select a learning path"
+                if selected_track_id
+                else "Select a track first",
+                disabled=selected_track_id is None,
                 format_func=lambda path_id: path_labels.get(path_id, path_id),
             )
-            delete_submit = st.form_submit_button("Delete learning path and modules")
+            delete_submit = st.form_submit_button(
+                "Delete learning path and modules",
+                disabled=selected_path_id is None,
+            )
             if delete_submit:
                 try:
                     delete_summary = delete_learning_path_and_modules(
                         data_dir=config.data_dir,
-                        path_id=selected_path_id,
+                        path_id=selected_path_id or "",
                     )
                     st.success(
                         "Deletion completed. "
