@@ -3,3 +3,5 @@ mod-vnet-intro,lp-az104-network,az-104,Introduction to Azure virtual networks,ht
 mod-vnet-peering,lp-az104-network,az-104,Design and implement VNet peering,https://learn.microsoft.com/training/modules/design-implement-vnet-peering/,2
 mod-iam-rbac,lp-az104-governance,az-104,Manage Azure identities and RBAC,https://learn.microsoft.com/training/modules/manage-azure-identities-rbac/,1
 mod-governance,lp-az104-governance,az-104,Implement governance and compliance in Azure,https://learn.microsoft.com/training/modules/implement-governance-compliance-azure/,2
+learn-wwl-get-tips-tricks-teach-az-104-microsoft-azure-administrator,lp-az-104-general,az-104,Get tips and tricks for teaching AZ-104 Microsoft Azure Administrator,https://learn.microsoft.com/en-us/training/modules/get-tips-tricks-teach-az-104-microsoft-azure-administrator/?WT.mc_id=api_CatalogApi,1
+learn-wwl-learn-best-practices-from-microsoft-technical-trainers-for-az-104,lp-az-104-general,az-104,Learn best practices from Microsoft Technical Trainers,https://learn.microsoft.com/en-us/training/modules/learn-best-practices-from-microsoft-technical-trainers-for-az-104/?WT.mc_id=api_CatalogApi,2

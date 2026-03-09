@@ -1,3 +1,4 @@
 path_id,track_id,path_name,provider_url
 lp-az104-network,az-104,Configure virtual networks,https://learn.microsoft.com/training/paths/az-104-configure-manage-virtual-networks/
 lp-az104-governance,az-104,Manage identities and governance,https://learn.microsoft.com/training/paths/az-104-manage-identities-governance/
+lp-az-104-general,az-104,AZ-104 Certification Track - General,
