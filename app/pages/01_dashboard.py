@@ -7,12 +7,23 @@ import plotly.express as px
 import streamlit as st
 
 from app.config import load_config
-from app.services.metrics_service import ALL_OPTION, get_date_bounds, get_filter_options, get_time_metrics
+from app.services.metrics_service import (
+    ALL_OPTION,
+    get_date_bounds,
+    get_filter_options,
+    get_time_metrics,
+)
 from app.services.progress_service import get_progress_metrics
 
 
 def _minutes_to_hours(minutes: int) -> str:
     return f"{minutes / 60:.1f} h"
+
+
+def _weekly_chart_df(weekly_df: pd.DataFrame) -> pd.DataFrame:
+    chart_df = weekly_df.copy()
+    chart_df["week_label"] = pd.to_datetime(chart_df["week_start"]).dt.strftime("%Y-%m-%d")
+    return chart_df
 
 
 def render() -> None:
@@ -35,17 +46,27 @@ def render() -> None:
             start_date = date_range[0]
             end_date = date_range[1]
         else:
-            single_date = date_range[0] if isinstance(date_range, tuple) and len(date_range) == 1 else date_range
+            single_date = (
+                date_range[0]
+                if isinstance(date_range, tuple) and len(date_range) == 1
+                else date_range
+            )
             start_date = single_date if isinstance(single_date, date) else max_date
             end_date = start_date
 
         user_options = [ALL_OPTION] + users_df["user_id"].tolist()
-        user_filter = st.selectbox("User", user_options, format_func=lambda v: _user_label(v, users_df))
+        user_filter = st.selectbox(
+            "User", user_options, format_func=lambda v: _user_label(v, users_df)
+        )
 
         track_options = [ALL_OPTION] + tracks_df["track_id"].tolist()
-        track_filter = st.selectbox("Track", track_options, format_func=lambda v: _track_label(v, tracks_df))
+        track_filter = st.selectbox(
+            "Track", track_options, format_func=lambda v: _track_label(v, tracks_df)
+        )
 
-    time_metrics = get_time_metrics(config.data_dir, start_date, end_date, user_filter, track_filter)
+    time_metrics = get_time_metrics(
+        config.data_dir, start_date, end_date, user_filter, track_filter
+    )
     progress_metrics = get_progress_metrics(config.data_dir, user_filter, track_filter)
 
     st.subheader("Time Tracking")
@@ -55,12 +76,14 @@ def render() -> None:
     metric_col3.metric("Weekly", _minutes_to_hours(time_metrics.weekly_minutes))
 
     if not time_metrics.weekly_df.empty:
+        weekly_chart_df = _weekly_chart_df(time_metrics.weekly_df)
         weekly_fig = px.bar(
-            time_metrics.weekly_df,
-            x="week_start",
+            weekly_chart_df,
+            x="week_label",
             y="minutes",
             title="Weekly Study Minutes",
-            labels={"week_start": "Week", "minutes": "Minutes"},
+            labels={"week_label": "Week Start", "minutes": "Minutes"},
+            category_orders={"week_label": weekly_chart_df["week_label"].tolist()},
         )
         st.plotly_chart(weekly_fig, width="stretch")
     else:
