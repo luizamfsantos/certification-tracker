@@ -1,12 +1,12 @@
 module_id,path_id,track_id,module_name,provider_url,module_order
-learn-wwl-introduction-microsoft-learn-educators-program,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,introduction microsoft learn educators program,,1
-learn-wwl-onboard-microsoft-learn-educators-program,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,onboard microsoft learn educators program,,2
-learn-wwl-microsoft-learn-educators-course-preparation,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,microsoft learn educators course preparation,,3
-learn-wwl-microsoft-learn-educators-course-plan,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,microsoft learn educators course plan,,4
+learn-wwl-introduction-microsoft-learn-educators-program,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,azure-data-fundamentals,introduction microsoft learn educators program,,1
+learn-wwl-onboard-microsoft-learn-educators-program,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,azure-data-fundamentals,onboard microsoft learn educators program,,2
+learn-wwl-microsoft-learn-educators-course-preparation,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,azure-data-fundamentals,microsoft learn educators course preparation,,3
+learn-wwl-microsoft-learn-educators-course-plan,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,azure-data-fundamentals,microsoft learn educators course plan,,4
 learn-wwl-learn-best-practices-from-microsoft-technical-trainers-for-az-104,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,learn best practices from microsoft technical trainers for az 104,,5
 learn-wwl-get-tips-tricks-teach-az-104-microsoft-azure-administrator,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,get tips tricks teach az 104 microsoft azure administrator,,6
-learn-wwl-prepare-for-course-delivery,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,prepare for course delivery,,7
-learn-wwl-close-out-course,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,close out course,,8
+learn-wwl-prepare-for-course-delivery,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,azure-data-fundamentals,prepare for course delivery,,7
+learn-wwl-close-out-course,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,azure-data-fundamentals,close out course,,8
 learn-intro-to-azure-cloud-shell,learn-az104-admin-prerequisites,az-104,intro to azure cloud shell,,1
 learn-azure-create-resource-manager-template-vs-code,learn-az104-admin-prerequisites,az-104,create resource manager template vs code,,2
 learn-wwl-understand-azure-active-directory,learn-az-104-manage-identities-governance,az-104,understand azure active directory,,1
@@ -36,5 +36,14 @@ learn-wwl-configure-app-service-plans,learn-az-104-manage-compute-resources,az-1
 learn-wwl-configure-azure-app-services,learn-az-104-manage-compute-resources,az-104,configure azure app services,,4
 learn-wwl-configure-azure-container-instances,learn-az-104-manage-compute-resources,az-104,configure azure container instances,,5
 learn-wwl-teach-ai-102-design-implement-microsoft-azure-ai-solution,learn-wwl-prepare-teach-ai-102-microsoft-design-implement-azure,az-104,teach ai 102 design implement microsoft azure ai solution,,1
-learn-wwl-learn-best-practices-from-microsoft-technical-trainers,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,learn best practices from microsoft technical trainers,,5
-learn-wwl-get-tips-tricks-teach-dp-900-microsoft-azure-data-fundamentals,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,get tips tricks teach dp 900 microsoft azure data fundamentals,,6
+learn-wwl-learn-best-practices-from-microsoft-technical-trainers,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,azure-data-fundamentals,learn best practices from microsoft technical trainers,,5
+learn-wwl-get-tips-tricks-teach-dp-900-microsoft-azure-data-fundamentals,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,azure-data-fundamentals,get tips tricks teach dp 900 microsoft azure data fundamentals,,6
+learn-wwl-explore-core-data-concepts,learn-wwl-azure-data-fundamentals-explore-core-data-concepts,azure-data-fundamentals,explore core data concepts,,1
+learn-wwl-explore-roles-responsibilities-world-of-data,learn-wwl-azure-data-fundamentals-explore-core-data-concepts,azure-data-fundamentals,explore roles responsibilities world of data,,2
+learn-wwl-explore-relational-data-offerings,learn-wwl-azure-data-fundamentals-explore-relational-data,azure-data-fundamentals,explore relational data offerings,,1
+learn-wwl-explore-provision-deploy-relational-database-offerings-azure,learn-wwl-azure-data-fundamentals-explore-relational-data,azure-data-fundamentals,explore provision deploy relational database offerings azure,,2
+learn-wwl-explore-provision-deploy-non-relational-data-services-azure,learn-wwl-azure-data-fundamentals-explore-non-relational-data,azure-data-fundamentals,explore provision deploy non relational data services azure,,1
+learn-wwl-explore-non-relational-data-stores-azure,learn-wwl-azure-data-fundamentals-explore-non-relational-data,azure-data-fundamentals,explore non relational data stores azure,,2
+learn-wwl-examine-components-of-modern-data-warehouse,learn-wwl-azure-data-fundamentals-explore-data-warehouse-analytics,azure-data-fundamentals,examine components of modern data warehouse,,1
+learn-wwl-explore-fundamentals-of-stream-processing,learn-wwl-azure-data-fundamentals-explore-data-warehouse-analytics,azure-data-fundamentals,explore fundamentals of stream processing,,2
+learn-wwl-explore-fundamentals-of-data-visualization,learn-wwl-azure-data-fundamentals-explore-data-warehouse-analytics,azure-data-fundamentals,explore fundamentals of data visualization,,3
