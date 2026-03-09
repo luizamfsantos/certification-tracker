@@ -14,7 +14,9 @@ from urllib.parse import urljoin
 from urllib.request import Request, urlopen
 
 
-DEFAULT_CATALOG_API_URL = "https://learn.microsoft.com/api/catalog/?type=learningPaths&product=azure&locale=en-us"
+DEFAULT_CATALOG_API_URL = (
+    "https://learn.microsoft.com/api/catalog/?type=learningPaths&product=azure&locale=en-us"
+)
 
 
 @dataclass(frozen=True)
@@ -94,7 +96,9 @@ def import_catalog_to_csv(
     )
     track_row, path_rows, module_rows = map_catalog_to_rows(items, normalized_exam)
 
-    tracks_upserted = upsert_csv_rows(data_dir / "certification_tracks.csv", "track_id", [track_row])
+    tracks_upserted = upsert_csv_rows(
+        data_dir / "certification_tracks.csv", "track_id", [track_row]
+    )
     learning_paths_upserted = upsert_csv_rows(data_dir / "learning_paths.csv", "path_id", path_rows)
     modules_upserted = upsert_csv_rows(data_dir / "modules.csv", "module_id", module_rows)
 
@@ -148,14 +152,20 @@ def map_catalog_to_rows(
                 "provider_url": _entry_url(path_item),
             }
         )
-        path_module_refs[path_id] = _extract_related_ids(path_item)
+        related_modules = _extract_related_modules(path_item)
+        refs: list[str] = []
+        for related_module in related_modules:
+            module_id = _entry_id(related_module, "mod")
+            refs.append(module_id)
+            module_item_by_id.setdefault(module_id, related_module)
+        path_module_refs[path_id] = refs
 
     selected_module_ids: set[str] = set()
     selected_modules_by_path: dict[str, list[str]] = {path_id: [] for path_id in path_module_refs}
     for path_id, refs in path_module_refs.items():
         for ref in refs:
-            if ref in module_item_by_id:
-                selected_module_ids.add(ref)
+            selected_module_ids.add(ref)
+            if ref not in selected_modules_by_path[path_id]:
                 selected_modules_by_path[path_id].append(ref)
 
     for module_entry in module_items:
@@ -181,10 +191,23 @@ def map_catalog_to_rows(
             path_id_by_module.setdefault(module_id, path_id)
 
     default_path_id = path_rows[0]["path_id"]
+    ordered_module_ids: list[str] = []
+    seen_module_ids: set[str] = set()
+    for path_row in path_rows:
+        path_id = path_row["path_id"]
+        for module_id in selected_modules_by_path.get(path_id, []):
+            if module_id not in seen_module_ids:
+                ordered_module_ids.append(module_id)
+                seen_module_ids.add(module_id)
+    for module_id in sorted(selected_module_ids):
+        if module_id not in seen_module_ids:
+            ordered_module_ids.append(module_id)
+            seen_module_ids.add(module_id)
+
     module_rows: list[dict[str, str]] = []
     path_order_counter: dict[str, int] = {}
 
-    for module_id in sorted(selected_module_ids):
+    for module_id in ordered_module_ids:
         module_item: dict[str, Any] | None = module_item_by_id.get(module_id)
         if not module_item:
             continue
@@ -290,7 +313,9 @@ def _request_json_via_curl(
 ) -> dict[str, Any] | list[Any]:
     curl_bin = shutil.which("curl.exe") or shutil.which("curl")
     if not curl_bin:
-        raise RuntimeError("curl executable not found. Install curl or switch transport to 'urllib'.")
+        raise RuntimeError(
+            "curl executable not found. Install curl or switch transport to 'urllib'."
+        )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     command = [
@@ -318,7 +343,9 @@ def _request_json_via_curl(
         raise RuntimeError(f"curl request failed for {url}: {stderr or 'unknown curl error'}")
     body = output_path.read_bytes()
     payload = _parse_json_response(body, "", url)
-    output_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    output_path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
     return payload
 
 
@@ -383,7 +410,7 @@ def _extract_items_and_next(
         return entries, None
 
     items: list[dict[str, Any]] = []
-    for key in ("items", "results", "value"):
+    for key in ("items", "results", "value", "learningPaths"):
         value = payload.get(key)
         if isinstance(value, list):
             items = [item for item in value if isinstance(item, dict)]
@@ -443,17 +470,17 @@ def _entry_url(item: dict[str, Any]) -> str:
     return str(value).strip()
 
 
-def _extract_related_ids(item: dict[str, Any]) -> list[str]:
-    related: list[str] = []
+def _extract_related_modules(item: dict[str, Any]) -> list[dict[str, Any]]:
+    related: list[dict[str, Any]] = []
     candidate_keys = ("modules", "children", "moduleUids", "moduleIds", "items")
     for key in candidate_keys:
         value = item.get(key)
         if isinstance(value, list):
             for entry in value:
                 if isinstance(entry, str):
-                    related.append(_entry_id({"uid": entry}, "mod"))
+                    related.append({"uid": entry, "title": _fallback_module_title(entry)})
                 elif isinstance(entry, dict):
-                    related.append(_entry_id(entry, "mod"))
+                    related.append(entry)
     return related
 
 
@@ -462,3 +489,12 @@ def _find_certification_title(catalog_items: list[dict[str, Any]], exam_code: st
         if _looks_like_type(item, "certification") and _is_related_to_exam(item, exam_code):
             return _entry_title(item)
     return None
+
+
+def _fallback_module_title(module_uid: str) -> str:
+    uid = module_uid.strip()
+    if not uid:
+        return "Untitled"
+    tail = uid.rsplit(".", 1)[-1]
+    title = tail.replace("-", " ").replace("_", " ").strip()
+    return title if title else uid

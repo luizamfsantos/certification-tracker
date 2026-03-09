@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from app.services.catalog_import_service import (
+    _extract_items_and_next,
     _parse_json_response,
     _request_json_via_curl,
     import_catalog_to_csv,
@@ -34,6 +35,32 @@ def test_map_catalog_to_rows_filters_and_relates_items() -> None:
     assert all("az-900" not in row["module_name"].lower() for row in module_rows)
 
 
+def test_map_catalog_to_rows_uses_learning_path_module_refs_when_module_items_are_missing() -> None:
+    items: list[dict[str, object]] = [
+        {
+            "uid": "learn.az-104-manage-storage",
+            "type": "learningPath",
+            "title": "AZ-104: Implement and manage storage in Azure",
+            "url": "https://learn.microsoft.com/en-us/training/paths/az-104-manage-storage/",
+            "modules": [
+                "learn.wwl.configure-storage-accounts",
+                "learn.wwl.configure-azure-files-file-sync",
+            ],
+        }
+    ]
+
+    _, path_rows, module_rows = map_catalog_to_rows(items, "AZ-104")
+
+    assert len(path_rows) == 1
+    assert [row["module_id"] for row in module_rows] == [
+        "learn-wwl-configure-storage-accounts",
+        "learn-wwl-configure-azure-files-file-sync",
+    ]
+    assert [row["module_order"] for row in module_rows] == ["1", "2"]
+    assert module_rows[0]["module_name"] == "configure storage accounts"
+    assert module_rows[0]["provider_url"] == ""
+
+
 def test_import_catalog_to_csv_is_idempotent(tmp_path: Path) -> None:
     data_dir = tmp_path / "curated"
     bootstrap_curated_csvs(data_dir)
@@ -55,8 +82,10 @@ def test_import_catalog_to_csv_is_idempotent(tmp_path: Path) -> None:
 
 
 def test_parse_json_response_supports_utf8_bom() -> None:
-    body = b"\xef\xbb\xbf{\"items\":[]}"
-    payload = _parse_json_response(body, "application/json; charset=utf-8", "https://learn.microsoft.com/api/catalog/")
+    body = b'\xef\xbb\xbf{"items":[]}'
+    payload = _parse_json_response(
+        body, "application/json; charset=utf-8", "https://learn.microsoft.com/api/catalog/"
+    )
     assert isinstance(payload, dict)
     assert payload["items"] == []
 
@@ -64,10 +93,33 @@ def test_parse_json_response_supports_utf8_bom() -> None:
 def test_parse_json_response_rejects_html() -> None:
     html = b"<!DOCTYPE html><html><body>not json</body></html>"
     with pytest.raises(ValueError, match="Expected JSON"):
-        _parse_json_response(html, "text/html; charset=utf-8", "https://learn.microsoft.com/api/catalog/")
+        _parse_json_response(
+            html, "text/html; charset=utf-8", "https://learn.microsoft.com/api/catalog/"
+        )
 
 
-def test_request_json_via_curl_exports_raw_and_parses(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_extract_items_and_next_supports_learning_paths_key() -> None:
+    payload = {
+        "learningPaths": [
+            {"uid": "learn.az-104-manage-storage"},
+            {"uid": "learn.az-104-manage-compute-resources"},
+        ],
+        "nextLink": "/api/catalog/?type=learningPaths&product=azure&skip=2",
+    }
+    items, next_url = _extract_items_and_next(
+        payload, "https://learn.microsoft.com/api/catalog/?type=learningPaths"
+    )
+
+    assert len(items) == 2
+    assert (
+        next_url
+        == "https://learn.microsoft.com/api/catalog/?type=learningPaths&product=azure&skip=2"
+    )
+
+
+def test_request_json_via_curl_exports_raw_and_parses(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     output_path = tmp_path / "catalog_raw.json"
 
     monkeypatch.setattr("app.services.catalog_import_service.shutil.which", lambda _: "curl.exe")
@@ -96,4 +148,7 @@ def test_request_json_via_curl_exports_raw_and_parses(monkeypatch: pytest.Monkey
     assert output_path.exists()
     assert isinstance(payload, dict)
     assert len(payload["items"]) == 1
-    assert output_path.read_text(encoding="utf-8") == '{\n  "items": [\n    {\n      "uid": "x"\n    }\n  ]\n}\n'
+    assert (
+        output_path.read_text(encoding="utf-8")
+        == '{\n  "items": [\n    {\n      "uid": "x"\n    }\n  ]\n}\n'
+    )

@@ -3,5 +3,40 @@ mod-vnet-intro,lp-az104-network,az-104,Introduction to Azure virtual networks,ht
 mod-vnet-peering,lp-az104-network,az-104,Design and implement VNet peering,https://learn.microsoft.com/training/modules/design-implement-vnet-peering/,2
 mod-iam-rbac,lp-az104-governance,az-104,Manage Azure identities and RBAC,https://learn.microsoft.com/training/modules/manage-azure-identities-rbac/,1
 mod-governance,lp-az104-governance,az-104,Implement governance and compliance in Azure,https://learn.microsoft.com/training/modules/implement-governance-compliance-azure/,2
-learn-wwl-get-tips-tricks-teach-az-104-microsoft-azure-administrator,lp-az-104-general,az-104,Get tips and tricks for teaching AZ-104 Microsoft Azure Administrator,https://learn.microsoft.com/en-us/training/modules/get-tips-tricks-teach-az-104-microsoft-azure-administrator/?WT.mc_id=api_CatalogApi,1
-learn-wwl-learn-best-practices-from-microsoft-technical-trainers-for-az-104,lp-az-104-general,az-104,Learn best practices from Microsoft Technical Trainers,https://learn.microsoft.com/en-us/training/modules/learn-best-practices-from-microsoft-technical-trainers-for-az-104/?WT.mc_id=api_CatalogApi,2
+learn-wwl-get-tips-tricks-teach-az-104-microsoft-azure-administrator,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,get tips tricks teach az 104 microsoft azure administrator,,6
+learn-wwl-learn-best-practices-from-microsoft-technical-trainers-for-az-104,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,learn best practices from microsoft technical trainers for az 104,,5
+learn-wwl-introduction-microsoft-learn-educators-program,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,introduction microsoft learn educators program,,1
+learn-wwl-onboard-microsoft-learn-educators-program,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,onboard microsoft learn educators program,,2
+learn-wwl-microsoft-learn-educators-course-preparation,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,microsoft learn educators course preparation,,3
+learn-wwl-microsoft-learn-educators-course-plan,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,microsoft learn educators course plan,,4
+learn-wwl-prepare-for-course-delivery,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,prepare for course delivery,,7
+learn-wwl-close-out-course,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,close out course,,8
+learn-intro-to-azure-cloud-shell,learn-az104-admin-prerequisites,az-104,intro to azure cloud shell,,1
+learn-azure-create-resource-manager-template-vs-code,learn-az104-admin-prerequisites,az-104,create resource manager template vs code,,2
+learn-wwl-understand-azure-active-directory,learn-az-104-manage-identities-governance,az-104,understand azure active directory,,1
+learn-wwl-create-configure-manage-identities,learn-az-104-manage-identities-governance,az-104,create configure manage identities,,2
+learn-wwl-describe-core-architectural-components-of-azure,learn-az-104-manage-identities-governance,az-104,describe core architectural components of azure,,3
+learn-bizapps-sovereignty-policy-initiatives,learn-az-104-manage-identities-governance,az-104,sovereignty policy initiatives,,4
+learn-secure-azure-resources-with-rbac,learn-az-104-manage-identities-governance,az-104,secure azure resources with rbac,,5
+learn-azure-allow-users-to-reset-their-password,learn-az-104-manage-identities-governance,az-104,allow users to reset their password,,6
+learn-wwl-configure-virtual-networks,learn-az-104-manage-virtual-networks,az-104,configure virtual networks,,1
+learn-wwl-configure-network-security-groups,learn-az-104-manage-virtual-networks,az-104,configure network security groups,,2
+learn-azure-host-domain-azure-dns,learn-az-104-manage-virtual-networks,az-104,host domain azure dns,,3
+learn-wwl-configure-vnet-peering,learn-az-104-manage-virtual-networks,az-104,configure vnet peering,,4
+learn-control-network-traffic-flow-with-routes,learn-az-104-manage-virtual-networks,az-104,control network traffic flow with routes,,5
+learn-azure-intro-to-azure-load-balancer,learn-az-104-manage-virtual-networks,az-104,intro to azure load balancer,,6
+learn-azure-intro-to-azure-application-gateway,learn-az-104-manage-virtual-networks,az-104,intro to azure application gateway,,7
+learn-azure-intro-to-azure-network-watcher,learn-az-104-manage-virtual-networks,az-104,intro to azure network watcher,,8
+learn-wwl-configure-storage-accounts,learn-az-104-manage-storage,az-104,configure storage accounts,,1
+learn-wwl-configure-blob-storage,learn-az-104-manage-storage,az-104,configure blob storage,,2
+learn-wwl-configure-storage-security,learn-az-104-manage-storage,az-104,configure storage security,,3
+learn-wwl-configure-azure-files-file-sync,learn-az-104-manage-storage,az-104,configure azure files file sync,,4
+learn-introduction-to-azure-backup,learn-az-104-monitor-backup-resources,az-104,introduction to azure backup,,1
+learn-protect-virtual-machines-with-azure-backup,learn-az-104-monitor-backup-resources,az-104,protect virtual machines with azure backup,,2
+learn-azure-monitor-azure-vm-using-diagnostic-data,learn-az-104-monitor-backup-resources,az-104,monitor azure vm using diagnostic data,,3
+learn-introduction-to-azure-virtual-machines,learn-az-104-manage-compute-resources,az-104,introduction to azure virtual machines,,1
+learn-wwl-configure-virtual-machine-availability,learn-az-104-manage-compute-resources,az-104,configure virtual machine availability,,2
+learn-wwl-configure-app-service-plans,learn-az-104-manage-compute-resources,az-104,configure app service plans,,3
+learn-wwl-configure-azure-app-services,learn-az-104-manage-compute-resources,az-104,configure azure app services,,4
+learn-wwl-configure-azure-container-instances,learn-az-104-manage-compute-resources,az-104,configure azure container instances,,5
+learn-wwl-teach-ai-102-design-implement-microsoft-azure-ai-solution,learn-wwl-prepare-teach-ai-102-microsoft-design-implement-azure,az-104,teach ai 102 design implement microsoft azure ai solution,,1
