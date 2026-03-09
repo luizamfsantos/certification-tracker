@@ -17,6 +17,7 @@ class TimeMetricsResult:
     total_minutes: int
     daily_minutes: int
     weekly_minutes: int
+    daily_df: pd.DataFrame
     weekly_df: pd.DataFrame
     per_user_df: pd.DataFrame
     per_module_df: pd.DataFrame
@@ -78,7 +79,9 @@ def get_time_metrics(
 ) -> TimeMetricsResult:
     where_clause, base_params = _build_time_filter_clause(start_date, end_date, user_id, track_id)
 
-    total_query = f"SELECT COALESCE(SUM(t.minutes_spent), 0) FROM time_entries t WHERE {where_clause};"
+    total_query = (
+        f"SELECT COALESCE(SUM(t.minutes_spent), 0) FROM time_entries t WHERE {where_clause};"
+    )
     total_minutes = _to_int(query_scalar(data_dir, total_query, base_params))
 
     daily_query = (
@@ -93,6 +96,17 @@ def get_time_metrics(
         f"AND date_trunc('week', CAST(t.entry_date AS DATE)) = date_trunc('week', ?::DATE);"
     )
     weekly_minutes = _to_int(query_scalar(data_dir, weekly_query, [*base_params, end_date]))
+
+    daily_df = query_df(
+        data_dir,
+        (
+            "SELECT CAST(t.entry_date AS DATE) AS entry_date, "
+            "SUM(t.minutes_spent) AS minutes "
+            f"FROM time_entries t WHERE {where_clause} "
+            "GROUP BY 1 ORDER BY 1;"
+        ),
+        base_params,
+    )
 
     weekly_df = query_df(
         data_dir,
@@ -145,6 +159,7 @@ def get_time_metrics(
         total_minutes=total_minutes,
         daily_minutes=daily_minutes,
         weekly_minutes=weekly_minutes,
+        daily_df=daily_df,
         weekly_df=weekly_df,
         per_user_df=per_user_df,
         per_module_df=per_module_df,

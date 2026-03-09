@@ -39,4 +39,11 @@ def test_time_metrics_aggregations(tmp_path: Path) -> None:
     assert result.total_minutes == 245
     assert result.daily_minutes == 20
     assert result.weekly_minutes == 245
+    assert result.daily_df["entry_date"].dt.strftime("%Y-%m-%d").tolist() == [
+        "2026-03-02",
+        "2026-03-03",
+        "2026-03-07",
+        "2026-03-08",
+    ]
+    assert result.daily_df["minutes"].tolist() == [60, 75, 90, 20]
     assert set(result.per_user_df["user_name"].tolist()) == {"Alice", "Bob"}

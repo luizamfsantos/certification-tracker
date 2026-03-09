@@ -43,6 +43,40 @@ def _progress_bar_chart_df(progress_bar_df: pd.DataFrame) -> pd.DataFrame:
     return chart_df.sort_values("completion_pct", ascending=True)
 
 
+def _daily_heatmap_pivot(
+    daily_df: pd.DataFrame,
+    start_date: date,
+    end_date: date,
+) -> pd.DataFrame:
+    all_days = pd.DataFrame({"entry_date": pd.date_range(start=start_date, end=end_date, freq="D")})
+    working_daily = daily_df.copy()
+    if not working_daily.empty:
+        working_daily["entry_date"] = pd.to_datetime(working_daily["entry_date"])
+    heatmap_df = all_days.merge(working_daily, on="entry_date", how="left")
+    heatmap_df["minutes"] = heatmap_df["minutes"].fillna(0)
+
+    heatmap_df["week_start"] = heatmap_df["entry_date"] - pd.to_timedelta(
+        heatmap_df["entry_date"].dt.weekday, unit="D"
+    )
+    heatmap_df["week_label"] = heatmap_df["week_start"].dt.strftime("%Y-%m-%d")
+    weekday_map = {
+        0: "Mon",
+        1: "Tue",
+        2: "Wed",
+        3: "Thu",
+        4: "Fri",
+        5: "Sat",
+        6: "Sun",
+    }
+    heatmap_df["weekday_label"] = heatmap_df["entry_date"].dt.weekday.map(weekday_map)
+
+    pivot = heatmap_df.pivot(index="weekday_label", columns="week_label", values="minutes").fillna(
+        0
+    )
+    weekday_order = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    return pivot.reindex(weekday_order)
+
+
 def render() -> None:
     config = load_config()
     st.set_page_config(page_title="Dashboard", layout="wide")
@@ -105,6 +139,23 @@ def render() -> None:
         st.plotly_chart(weekly_fig, width="stretch")
     else:
         st.info("No time entries found for selected filters.")
+
+    daily_heatmap_matrix = _daily_heatmap_pivot(time_metrics.daily_df, start_date, end_date)
+    heatmap_fig = px.imshow(
+        daily_heatmap_matrix,
+        aspect="auto",
+        title="Daily Study Heatmap",
+        labels={"x": "Week Start", "y": "Day", "color": "Minutes"},
+        color_continuous_scale=[
+            (0.0, "#ebedf0"),
+            (0.25, "#9be9a8"),
+            (0.5, "#40c463"),
+            (0.75, "#30a14e"),
+            (1.0, "#216e39"),
+        ],
+    )
+    heatmap_fig.update_layout(margin=dict(l=40, r=20, t=60, b=40))
+    st.plotly_chart(heatmap_fig, width="stretch")
 
     st.write("Breakdowns")
     breakdown_col1, breakdown_col2, breakdown_col3 = st.columns(3)
