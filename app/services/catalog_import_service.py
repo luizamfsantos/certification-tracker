@@ -317,7 +317,9 @@ def _request_json_via_curl(
         stderr = (result.stderr or "").strip()
         raise RuntimeError(f"curl request failed for {url}: {stderr or 'unknown curl error'}")
     body = output_path.read_bytes()
-    return _parse_json_response(body, "", url)
+    payload = _parse_json_response(body, "", url)
+    output_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return payload
 
 
 def _raw_output_path(raw_dir: Path | None, page_index: int, url: str) -> Path:

@@ -96,3 +96,4 @@ def test_request_json_via_curl_exports_raw_and_parses(monkeypatch: pytest.Monkey
     assert output_path.exists()
     assert isinstance(payload, dict)
     assert len(payload["items"]) == 1
+    assert output_path.read_text(encoding="utf-8") == '{\n  "items": [\n    {\n      "uid": "x"\n    }\n  ]\n}\n'
