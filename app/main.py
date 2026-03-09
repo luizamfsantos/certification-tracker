@@ -3,7 +3,7 @@ from __future__ import annotations
 import streamlit as st
 
 from app.config import load_config
-from app.services.duckdb_service import count_rows_for_curated_csvs
+from app.services.metrics_service import get_date_bounds, get_weekly_study_sessions_by_user
 
 
 def main() -> None:
@@ -12,21 +12,19 @@ def main() -> None:
     st.title("Certification Tracker")
     st.caption("Use the left sidebar to open Dashboard and Data Entry pages.")
 
-    st.subheader("Environment")
-    st.write(
-        {
-            "env": config.env,
-            "data_dir": str(config.data_dir),
-            "log_level": config.log_level,
-        }
-    )
+    st.subheader("This Week")
+    _, max_date = get_date_bounds(config.data_dir)
+    sessions_df = get_weekly_study_sessions_by_user(config.data_dir, max_date)
+    if sessions_df.empty:
+        st.info("No users found.")
+    else:
+        for row in sessions_df.itertuples(index=False):
+            label = f"{row.display_name} studied {int(row.sessions)} time(s) this week."
+            if int(row.sessions) > 0:
+                st.success(label)
+            else:
+                st.info(label)
 
-    st.subheader("Curated CSV Status")
-    counts = count_rows_for_curated_csvs(config.data_dir)
-    st.dataframe(
-        [{"file": name, "rows": rows} for name, rows in counts.items()],
-        width="stretch",
-    )
     st.info("Next: open `01_dashboard` for analytics and `02_data_entry` to update tracker CSVs.")
 
 

@@ -53,6 +53,25 @@ def get_modules_for_track(data_dir: Path, track_id: str | None = None) -> pd.Dat
     return query_df(data_dir, query, [track_id, track_id])
 
 
+def get_weekly_study_sessions_by_user(data_dir: Path, week_anchor: date) -> pd.DataFrame:
+    return query_df(
+        data_dir,
+        (
+            "SELECT "
+            "u.user_id, "
+            "u.display_name, "
+            "COALESCE(COUNT(t.entry_id), 0) AS sessions "
+            "FROM users u "
+            "LEFT JOIN time_entries t "
+            "ON t.user_id = u.user_id "
+            "AND date_trunc('week', CAST(t.entry_date AS DATE)) = date_trunc('week', ?::DATE) "
+            "GROUP BY 1, 2 "
+            "ORDER BY 3 DESC, 2;"
+        ),
+        [week_anchor],
+    )
+
+
 def _build_time_filter_clause(
     start_date: date,
     end_date: date,

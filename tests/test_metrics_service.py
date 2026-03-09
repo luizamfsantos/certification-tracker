@@ -4,7 +4,11 @@ import shutil
 from datetime import date
 from pathlib import Path
 
-from app.services.metrics_service import ALL_OPTION, get_time_metrics
+from app.services.metrics_service import (
+    ALL_OPTION,
+    get_time_metrics,
+    get_weekly_study_sessions_by_user,
+)
 
 
 FIXTURE_MAP = {
@@ -47,3 +51,13 @@ def test_time_metrics_aggregations(tmp_path: Path) -> None:
     ]
     assert result.daily_df["minutes"].tolist() == [60, 75, 90, 20]
     assert set(result.per_user_df["user_name"].tolist()) == {"Alice", "Bob"}
+
+
+def test_get_weekly_study_sessions_by_user(tmp_path: Path) -> None:
+    data_dir = tmp_path / "curated"
+    _seed_data_dir(data_dir)
+
+    sessions_df = get_weekly_study_sessions_by_user(data_dir, date(2026, 3, 8))
+
+    assert sessions_df["display_name"].tolist() == ["Alice", "Bob"]
+    assert sessions_df["sessions"].tolist() == [3, 2]
