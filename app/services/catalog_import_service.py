@@ -11,7 +11,7 @@ from urllib.parse import urljoin
 from urllib.request import Request, urlopen
 
 
-DEFAULT_CATALOG_API_URL = "https://learn.microsoft.com/api/catalog/"
+DEFAULT_CATALOG_API_URL = "https://learn.microsoft.com/api/catalog/?type=learningPaths&product=azure&locale=en-us"
 
 
 @dataclass(frozen=True)
