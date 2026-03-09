@@ -62,15 +62,15 @@ def render() -> None:
             title="Weekly Study Minutes",
             labels={"week_start": "Week", "minutes": "Minutes"},
         )
-        st.plotly_chart(weekly_fig, use_container_width=True)
+        st.plotly_chart(weekly_fig, width="stretch")
     else:
         st.info("No time entries found for selected filters.")
 
     st.write("Breakdowns")
     breakdown_col1, breakdown_col2, breakdown_col3 = st.columns(3)
-    breakdown_col1.dataframe(time_metrics.per_user_df, use_container_width=True)
-    breakdown_col2.dataframe(time_metrics.per_module_df, use_container_width=True)
-    breakdown_col3.dataframe(time_metrics.per_track_df, use_container_width=True)
+    breakdown_col1.dataframe(time_metrics.per_user_df, width="stretch")
+    breakdown_col2.dataframe(time_metrics.per_module_df, width="stretch")
+    breakdown_col3.dataframe(time_metrics.per_track_df, width="stretch")
 
     st.subheader("Progress Toward Certification")
     st.metric("Completion", f"{progress_metrics.completion_pct:.2f}%")
@@ -82,7 +82,7 @@ def render() -> None:
         names="status",
         title="Status Distribution",
     )
-    pie_col.plotly_chart(pie_fig, use_container_width=True)
+    pie_col.plotly_chart(pie_fig, width="stretch")
 
     if not progress_metrics.progress_bar_df.empty:
         bar_fig = px.bar(
@@ -93,7 +93,7 @@ def render() -> None:
             title="Completion by Dimension",
             labels={"completion_pct": "Completion %", "label": "Dimension"},
         )
-        bar_col.plotly_chart(bar_fig, use_container_width=True)
+        bar_col.plotly_chart(bar_fig, width="stretch")
     else:
         bar_col.info("No progress data for selected filters.")
 

@@ -25,7 +25,7 @@ def main() -> None:
     counts = count_rows_for_curated_csvs(config.data_dir)
     st.dataframe(
         [{"file": name, "rows": rows} for name, rows in counts.items()],
-        use_container_width=True,
+        width="stretch",
     )
     st.info("Next: open `01_dashboard` for analytics and `02_data_entry` to update tracker CSVs.")
 
