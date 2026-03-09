@@ -249,7 +249,8 @@ Workflow:
    - `certification_tracks.csv`
    - `learning_paths.csv`
    - `modules.csv`
-5. User reviews and commits CSV changes.
+5. User can remove an imported learning path and its linked modules from the Catalog Import page.
+6. User reviews and commits CSV changes.
 
 Implementation note:
 - Keep importer idempotent by upserting on stable IDs (provider + catalog item ID/URL slug).

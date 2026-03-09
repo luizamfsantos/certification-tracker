@@ -32,6 +32,16 @@ class ImportSummary:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class DeleteLearningPathSummary:
+    path_id: str
+    deleted_paths: int
+    deleted_modules: int
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
 def fetch_catalog_items(
     api_url: str = DEFAULT_CATALOG_API_URL,
     retries: int = 3,
@@ -271,6 +281,65 @@ def upsert_csv_rows(csv_path: Path, key_field: str, rows: list[dict[str, str]]) 
             writer.writerow(by_key[key])
 
     return changed
+
+
+def list_learning_paths(data_dir: Path) -> list[dict[str, str]]:
+    _, rows = _read_csv_rows(data_dir / "learning_paths.csv")
+    return sorted(
+        [row for row in rows if row.get("path_id", "")],
+        key=lambda row: (row.get("track_id", ""), row.get("path_name", ""), row.get("path_id", "")),
+    )
+
+
+def delete_learning_path_and_modules(data_dir: Path, path_id: str) -> DeleteLearningPathSummary:
+    normalized_path_id = path_id.strip()
+    if not normalized_path_id:
+        raise ValueError("path_id is required")
+
+    learning_paths_csv = data_dir / "learning_paths.csv"
+    _, path_rows = _read_csv_rows(learning_paths_csv)
+    if not any(row.get("path_id", "") == normalized_path_id for row in path_rows):
+        raise ValueError(f"Learning path not found: {normalized_path_id}")
+
+    deleted_modules = _delete_csv_rows_by_value(
+        data_dir / "modules.csv", "path_id", normalized_path_id
+    )
+    deleted_paths = _delete_csv_rows_by_value(learning_paths_csv, "path_id", normalized_path_id)
+
+    return DeleteLearningPathSummary(
+        path_id=normalized_path_id,
+        deleted_paths=deleted_paths,
+        deleted_modules=deleted_modules,
+    )
+
+
+def _read_csv_rows(csv_path: Path) -> tuple[list[str], list[dict[str, str]]]:
+    if not csv_path.exists():
+        raise FileNotFoundError(f"CSV not found: {csv_path}")
+    with csv_path.open("r", newline="", encoding="utf-8") as read_file:
+        reader = csv.DictReader(read_file)
+        fieldnames = list(reader.fieldnames or [])
+        rows = [{name: str(row.get(name, "")) for name in fieldnames} for row in reader]
+    return fieldnames, rows
+
+
+def _write_csv_rows(csv_path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> None:
+    with csv_path.open("w", newline="", encoding="utf-8") as write_file:
+        writer = csv.DictWriter(write_file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def _delete_csv_rows_by_value(csv_path: Path, field_name: str, field_value: str) -> int:
+    fieldnames, rows = _read_csv_rows(csv_path)
+    if field_name not in fieldnames:
+        raise ValueError(f"CSV missing field '{field_name}': {csv_path}")
+
+    remaining_rows = [row for row in rows if row.get(field_name, "") != field_value]
+    deleted_count = len(rows) - len(remaining_rows)
+    if deleted_count > 0:
+        _write_csv_rows(csv_path, fieldnames, remaining_rows)
+    return deleted_count
 
 
 def _request_json(url: str, retries: int, timeout_seconds: int) -> dict[str, Any] | list[Any]:

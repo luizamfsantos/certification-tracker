@@ -11,7 +11,9 @@ from app.services.catalog_import_service import (
     _extract_items_and_next,
     _parse_json_response,
     _request_json_via_curl,
+    delete_learning_path_and_modules,
     import_catalog_to_csv,
+    list_learning_paths,
     map_catalog_to_rows,
 )
 from scripts.bootstrap_data import bootstrap_curated_csvs
@@ -79,6 +81,41 @@ def test_import_catalog_to_csv_is_idempotent(tmp_path: Path) -> None:
     with (data_dir / "modules.csv").open("r", encoding="utf-8", newline="") as file_obj:
         rows = list(csv.DictReader(file_obj))
     assert len(rows) == 2
+
+
+def test_delete_learning_path_and_modules_removes_path_and_modules(tmp_path: Path) -> None:
+    data_dir = tmp_path / "curated"
+    bootstrap_curated_csvs(data_dir)
+    import_catalog_to_csv(data_dir, "AZ-104", catalog_items=_load_catalog_fixture())
+
+    learning_paths = list_learning_paths(data_dir)
+    assert len(learning_paths) == 1
+
+    summary = delete_learning_path_and_modules(data_dir, learning_paths[0]["path_id"])
+
+    assert summary.deleted_paths == 1
+    assert summary.deleted_modules == 2
+    assert list_learning_paths(data_dir) == []
+
+    with (data_dir / "modules.csv").open("r", encoding="utf-8", newline="") as file_obj:
+        remaining_modules = list(csv.DictReader(file_obj))
+    assert remaining_modules == []
+
+
+def test_delete_learning_path_and_modules_raises_when_path_is_missing(tmp_path: Path) -> None:
+    data_dir = tmp_path / "curated"
+    bootstrap_curated_csvs(data_dir)
+    import_catalog_to_csv(data_dir, "AZ-104", catalog_items=_load_catalog_fixture())
+
+    with pytest.raises(ValueError, match="Learning path not found"):
+        delete_learning_path_and_modules(data_dir, "lp-missing")
+
+    with (data_dir / "learning_paths.csv").open("r", encoding="utf-8", newline="") as file_obj:
+        paths = list(csv.DictReader(file_obj))
+    with (data_dir / "modules.csv").open("r", encoding="utf-8", newline="") as file_obj:
+        modules = list(csv.DictReader(file_obj))
+    assert len(paths) == 1
+    assert len(modules) == 2
 
 
 def test_parse_json_response_supports_utf8_bom() -> None:
