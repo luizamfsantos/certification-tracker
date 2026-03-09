@@ -2,11 +2,17 @@ from __future__ import annotations
 
 import csv
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
 
-from app.services.catalog_import_service import import_catalog_to_csv, map_catalog_to_rows, _parse_json_response
+from app.services.catalog_import_service import (
+    _parse_json_response,
+    _request_json_via_curl,
+    import_catalog_to_csv,
+    map_catalog_to_rows,
+)
 from scripts.bootstrap_data import bootstrap_curated_csvs
 
 
@@ -59,3 +65,34 @@ def test_parse_json_response_rejects_html() -> None:
     html = b"<!DOCTYPE html><html><body>not json</body></html>"
     with pytest.raises(ValueError, match="Expected JSON"):
         _parse_json_response(html, "text/html; charset=utf-8", "https://learn.microsoft.com/api/catalog/")
+
+
+def test_request_json_via_curl_exports_raw_and_parses(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    output_path = tmp_path / "catalog_raw.json"
+
+    monkeypatch.setattr("app.services.catalog_import_service.shutil.which", lambda _: "curl.exe")
+
+    def fake_run(
+        command: list[str],
+        *,
+        capture_output: bool,
+        text: bool,
+        check: bool,
+    ) -> subprocess.CompletedProcess[str]:
+        out_index = command.index("--output")
+        target = Path(command[out_index + 1])
+        target.write_text('{"items":[{"uid":"x"}]}', encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    monkeypatch.setattr("app.services.catalog_import_service.subprocess.run", fake_run)
+
+    payload = _request_json_via_curl(
+        url="https://learn.microsoft.com/api/catalog/",
+        output_path=output_path,
+        retries=3,
+        timeout_seconds=15,
+    )
+
+    assert output_path.exists()
+    assert isinstance(payload, dict)
+    assert len(payload["items"]) == 1

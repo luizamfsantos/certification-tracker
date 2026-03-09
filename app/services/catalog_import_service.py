@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import csv
 import json
+import shutil
+import subprocess
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -32,18 +34,35 @@ def fetch_catalog_items(
     api_url: str = DEFAULT_CATALOG_API_URL,
     retries: int = 3,
     timeout_seconds: int = 30,
+    transport: str = "urllib",
+    raw_dir: Path | None = None,
 ) -> list[dict[str, Any]]:
     items: list[dict[str, Any]] = []
     next_url: str | None = api_url
     seen_urls: set[str] = set()
+    normalized_transport = transport.lower().strip()
+    if normalized_transport not in {"urllib", "curl"}:
+        raise ValueError("transport must be 'urllib' or 'curl'")
+
+    page_index = 1
 
     while next_url:
         if next_url in seen_urls:
             break
         seen_urls.add(next_url)
-        payload = _request_json(next_url, retries=retries, timeout_seconds=timeout_seconds)
+        if normalized_transport == "curl":
+            output_path = _raw_output_path(raw_dir, page_index, next_url)
+            payload = _request_json_via_curl(
+                url=next_url,
+                output_path=output_path,
+                retries=retries,
+                timeout_seconds=timeout_seconds,
+            )
+        else:
+            payload = _request_json(next_url, retries=retries, timeout_seconds=timeout_seconds)
         page_items, next_url = _extract_items_and_next(payload, current_url=next_url)
         items.extend(page_items)
+        page_index += 1
 
     return items
 
@@ -54,13 +73,25 @@ def import_catalog_to_csv(
     api_url: str = DEFAULT_CATALOG_API_URL,
     retries: int = 3,
     timeout_seconds: int = 30,
+    transport: str = "urllib",
+    raw_dir: Path | None = None,
     catalog_items: list[dict[str, Any]] | None = None,
 ) -> ImportSummary:
     normalized_exam = exam_code.strip().lower()
     if not normalized_exam:
         raise ValueError("exam_code is required")
 
-    items = catalog_items if catalog_items is not None else fetch_catalog_items(api_url, retries, timeout_seconds)
+    items = (
+        catalog_items
+        if catalog_items is not None
+        else fetch_catalog_items(
+            api_url=api_url,
+            retries=retries,
+            timeout_seconds=timeout_seconds,
+            transport=transport,
+            raw_dir=raw_dir,
+        )
+    )
     track_row, path_rows, module_rows = map_catalog_to_rows(items, normalized_exam)
 
     tracks_upserted = upsert_csv_rows(data_dir / "certification_tracks.csv", "track_id", [track_row])
@@ -249,6 +280,52 @@ def _request_json(url: str, retries: int, timeout_seconds: int) -> dict[str, Any
             raise RuntimeError(str(exc)) from exc
 
     raise RuntimeError(f"Catalog API request failed after {max_attempts} attempts for {url}")
+
+
+def _request_json_via_curl(
+    url: str,
+    output_path: Path,
+    retries: int,
+    timeout_seconds: int,
+) -> dict[str, Any] | list[Any]:
+    curl_bin = shutil.which("curl.exe") or shutil.which("curl")
+    if not curl_bin:
+        raise RuntimeError("curl executable not found. Install curl or switch transport to 'urllib'.")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    command = [
+        curl_bin,
+        "--silent",
+        "--show-error",
+        "--location",
+        "--fail",
+        "--retry",
+        str(max(0, retries - 1)),
+        "--retry-all-errors",
+        "--max-time",
+        str(timeout_seconds),
+        "--header",
+        "Accept: application/json",
+        "--user-agent",
+        "certification-tracker/0.1",
+        "--output",
+        str(output_path),
+        url,
+    ]
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+    if result.returncode != 0:
+        stderr = (result.stderr or "").strip()
+        raise RuntimeError(f"curl request failed for {url}: {stderr or 'unknown curl error'}")
+    body = output_path.read_bytes()
+    return _parse_json_response(body, "", url)
+
+
+def _raw_output_path(raw_dir: Path | None, page_index: int, url: str) -> Path:
+    destination_dir = raw_dir if raw_dir is not None else Path("data/raw/microsoft_learn")
+    destination_dir.mkdir(parents=True, exist_ok=True)
+    slug = "".join(ch if ch.isalnum() else "-" for ch in url.lower())
+    slug = "-".join(part for part in slug.split("-") if part)[:80]
+    return destination_dir / f"catalog-page-{page_index:03d}-{slug}.json"
 
 
 def _parse_json_response(body: bytes, content_type: str, url: str) -> dict[str, Any] | list[Any]:

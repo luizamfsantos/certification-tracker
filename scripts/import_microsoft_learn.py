@@ -12,6 +12,17 @@ def main() -> None:
     parser.add_argument("--exam-code", required=True, help="Exam code to filter catalog content (example: AZ-104)")
     parser.add_argument("--data-dir", default="data/curated", help="Path to curated CSV directory")
     parser.add_argument("--api-url", default=DEFAULT_CATALOG_API_URL, help="Microsoft Learn catalog API URL")
+    parser.add_argument(
+        "--transport",
+        choices=["urllib", "curl"],
+        default="curl",
+        help="HTTP transport for catalog fetch. Use curl to export raw payloads first.",
+    )
+    parser.add_argument(
+        "--raw-dir",
+        default="data/raw/microsoft_learn",
+        help="Directory for raw API payload exports when using curl transport.",
+    )
     parser.add_argument("--retries", type=int, default=3, help="HTTP retries")
     parser.add_argument("--timeout-seconds", type=int, default=30, help="HTTP timeout per request")
     args = parser.parse_args()
@@ -20,6 +31,8 @@ def main() -> None:
         data_dir=Path(args.data_dir),
         exam_code=args.exam_code,
         api_url=args.api_url,
+        transport=args.transport,
+        raw_dir=Path(args.raw_dir),
         retries=args.retries,
         timeout_seconds=args.timeout_seconds,
     )
