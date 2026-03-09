@@ -236,7 +236,15 @@ def render() -> None:
         st.info("No progress data for selected filters.")
 
     st.subheader("Module Table")
-    st.dataframe(time_metrics.per_module_df, width="stretch")
+    st.dataframe(
+        time_metrics.per_module_df,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "module_name": st.column_config.TextColumn("Module"),
+            "minutes": st.column_config.NumberColumn("Minutes", format="%d min"),
+        },
+    )
 
     st.subheader("Daily Heatmap")
     daily_heatmap_matrix = _daily_heatmap_pivot(time_metrics.daily_df, start_date, end_date)
