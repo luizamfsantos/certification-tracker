@@ -29,6 +29,18 @@ def _minutes_to_hours(minutes: int) -> str:
     return f"{minutes / 60:.1f} h"
 
 
+def _hours_delta_label(current_minutes: int, previous_minutes: int) -> str:
+    diff_hours = (current_minutes - previous_minutes) / 60
+    sign = "+" if diff_hours >= 0 else ""
+    return f"{sign}{diff_hours:.1f} h"
+
+
+def _int_delta_label(current_value: int, previous_value: int) -> str:
+    diff = current_value - previous_value
+    sign = "+" if diff >= 0 else ""
+    return f"{sign}{diff}"
+
+
 def _weekly_chart_df(weekly_df: pd.DataFrame) -> pd.DataFrame:
     chart_df = weekly_df.copy()
     chart_df["week_label"] = pd.to_datetime(chart_df["week_start"]).dt.strftime("%Y-%m-%d")
@@ -133,15 +145,45 @@ def render() -> None:
     time_metrics = get_time_metrics(
         config.data_dir, start_date, end_date, user_filter, track_filter
     )
+    period_days = (end_date - start_date).days + 1
+    previous_end_date = start_date - timedelta(days=1)
+    previous_start_date = previous_end_date - timedelta(days=period_days - 1)
+    previous_time_metrics = get_time_metrics(
+        config.data_dir,
+        previous_start_date,
+        previous_end_date,
+        user_filter,
+        track_filter,
+    )
     progress_metrics = get_progress_metrics(config.data_dir, user_filter, track_filter)
 
     st.subheader("Time Tracking")
     streak_days = _current_streak_days(time_metrics.daily_df, end_date)
+    previous_streak_days = _current_streak_days(
+        previous_time_metrics.daily_df,
+        previous_end_date,
+    )
     metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
-    metric_col1.metric("Total", _minutes_to_hours(time_metrics.total_minutes))
-    metric_col2.metric("Weekly", _minutes_to_hours(time_metrics.weekly_minutes))
-    metric_col3.metric("Daily", _minutes_to_hours(time_metrics.daily_minutes))
-    metric_col4.metric("Streak", f"{streak_days} day(s)")
+    metric_col1.metric(
+        "Total Hours",
+        _minutes_to_hours(time_metrics.total_minutes),
+        _hours_delta_label(time_metrics.total_minutes, previous_time_metrics.total_minutes),
+    )
+    metric_col2.metric(
+        "Weekly Hours",
+        _minutes_to_hours(time_metrics.weekly_minutes),
+        _hours_delta_label(time_metrics.weekly_minutes, previous_time_metrics.weekly_minutes),
+    )
+    metric_col3.metric(
+        "Daily Hours",
+        _minutes_to_hours(time_metrics.daily_minutes),
+        _hours_delta_label(time_metrics.daily_minutes, previous_time_metrics.daily_minutes),
+    )
+    metric_col4.metric(
+        "Streak",
+        f"{streak_days} days",
+        _int_delta_label(streak_days, previous_streak_days),
+    )
 
     if not time_metrics.weekly_df.empty:
         weekly_chart_df = _weekly_chart_df(time_metrics.weekly_df)
