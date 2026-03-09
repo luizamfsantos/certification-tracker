@@ -5,12 +5,12 @@ mod-iam-rbac,lp-az104-governance,az-104,Manage Azure identities and RBAC,https:/
 mod-governance,lp-az104-governance,az-104,Implement governance and compliance in Azure,https://learn.microsoft.com/training/modules/implement-governance-compliance-azure/,2
 learn-wwl-get-tips-tricks-teach-az-104-microsoft-azure-administrator,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,get tips tricks teach az 104 microsoft azure administrator,,6
 learn-wwl-learn-best-practices-from-microsoft-technical-trainers-for-az-104,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,learn best practices from microsoft technical trainers for az 104,,5
-learn-wwl-introduction-microsoft-learn-educators-program,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,introduction microsoft learn educators program,,1
-learn-wwl-onboard-microsoft-learn-educators-program,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,onboard microsoft learn educators program,,2
-learn-wwl-microsoft-learn-educators-course-preparation,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,microsoft learn educators course preparation,,3
-learn-wwl-microsoft-learn-educators-course-plan,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,microsoft learn educators course plan,,4
-learn-wwl-prepare-for-course-delivery,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,prepare for course delivery,,7
-learn-wwl-close-out-course,learn-wwl-prepare-teach-az-104-microsoft-azure-administrator,az-104,close out course,,8
+learn-wwl-introduction-microsoft-learn-educators-program,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,introduction microsoft learn educators program,,1
+learn-wwl-onboard-microsoft-learn-educators-program,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,onboard microsoft learn educators program,,2
+learn-wwl-microsoft-learn-educators-course-preparation,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,microsoft learn educators course preparation,,3
+learn-wwl-microsoft-learn-educators-course-plan,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,microsoft learn educators course plan,,4
+learn-wwl-prepare-for-course-delivery,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,prepare for course delivery,,7
+learn-wwl-close-out-course,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,close out course,,8
 learn-intro-to-azure-cloud-shell,learn-az104-admin-prerequisites,az-104,intro to azure cloud shell,,1
 learn-azure-create-resource-manager-template-vs-code,learn-az104-admin-prerequisites,az-104,create resource manager template vs code,,2
 learn-wwl-understand-azure-active-directory,learn-az-104-manage-identities-governance,az-104,understand azure active directory,,1
@@ -40,3 +40,5 @@ learn-wwl-configure-app-service-plans,learn-az-104-manage-compute-resources,az-1
 learn-wwl-configure-azure-app-services,learn-az-104-manage-compute-resources,az-104,configure azure app services,,4
 learn-wwl-configure-azure-container-instances,learn-az-104-manage-compute-resources,az-104,configure azure container instances,,5
 learn-wwl-teach-ai-102-design-implement-microsoft-azure-ai-solution,learn-wwl-prepare-teach-ai-102-microsoft-design-implement-azure,az-104,teach ai 102 design implement microsoft azure ai solution,,1
+learn-wwl-learn-best-practices-from-microsoft-technical-trainers,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,learn best practices from microsoft technical trainers,,5
+learn-wwl-get-tips-tricks-teach-dp-900-microsoft-azure-data-fundamentals,learn-wwl-prepare-teach-dp-900-fundamentals-academic-programs,dp-900,get tips tricks teach dp 900 microsoft azure data fundamentals,,6
