@@ -1,2 +1,5 @@
 entry_id,user_id,track_id,module_id,minutes_spent,entry_date,created_at
 aa051f41-2204-4b08-838d-55376b8825f3,u1,azure-data-fundamentals,learn-wwl-explore-core-data-concepts,5,2026-03-09,2026-03-09T11:23:21Z
+6c3228ff-05cd-4bd9-abb8-728f8a3b6b91,u2,az-104,learn-wwl-configure-virtual-networks,30,2026-03-09,2026-03-11T00:18:09Z
+abf0a790-8536-4f77-bbc0-b18bc71c7dbd,u2,az-104,learn-wwl-configure-virtual-networks,30,2026-03-10,2026-03-11T00:18:36Z
+3080332a-58a6-4e13-8786-5f46d992faee,u1,azure-data-fundamentals,learn-wwl-explore-core-data-concepts,30,2026-03-10,2026-03-11T00:19:01Z
